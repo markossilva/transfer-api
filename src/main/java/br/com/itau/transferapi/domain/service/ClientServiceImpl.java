@@ -43,7 +43,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public UUID createNewWallet(final UUID clientId) {
         final Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new RuntimeException(CLIENT_HAS_EXISTS));
+                .orElseThrow(() -> new DomainException(CLIENT_HAS_EXISTS));
 
         final Wallet newWallet = Wallet.builder(client.getId(), UUID.randomUUID())
                 .status(WalletStatus.CREATED)
