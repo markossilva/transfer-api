@@ -9,6 +9,7 @@ public enum MessageErrors {
     CLIENT_HAS_NO_TRANSACTIONS("Client with given id don't have any transaction"),
     DIFFERENT_WALLET_CLIENT_ID("Client ID to be have same in wallet");
     private final String message;
+
     MessageErrors(final String message) {
         this.message = message;
     }
