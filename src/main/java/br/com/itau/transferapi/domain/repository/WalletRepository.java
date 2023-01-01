@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface WalletRepository {
-    Optional<Wallet> findById(final UUID clientID, final UUID walletID);
+  Optional<Wallet> findById(final UUID clientId, final UUID walletId);
 
-    Optional<List<Wallet>> findByClientId(final UUID clientID);
+  Optional<List<Wallet>> findByClientId(final UUID clientId);
 
-    Wallet save(final Wallet wallet);
+  Wallet save(final Wallet wallet);
 }

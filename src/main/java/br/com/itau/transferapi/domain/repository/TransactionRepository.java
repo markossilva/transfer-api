@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TransactionRepository {
-    Optional<List<Transaction>> findAllByClientId(UUID clientID);
+  Optional<List<Transaction>> findAllByClientId(UUID clientID);
 
-    Optional<List<Transaction>> findAllByClientIdAndWallet(UUID clientID, UUID walletID);
+  Optional<List<Transaction>> findAllByClientIdAndWallet(UUID clientID, UUID walletID);
 }

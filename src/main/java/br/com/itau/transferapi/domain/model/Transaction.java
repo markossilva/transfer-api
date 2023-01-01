@@ -11,12 +11,12 @@ import java.util.UUID;
 @Builder
 @Data
 public class Transaction {
-    private BigInteger id;
-    private UUID originClientId;
-    private UUID targetClientId;
-    private UUID targetWalletId;
-    private BigDecimal value;
-    private TransactionStatus status;
-    private TransactionType type;
-    private LocalDateTime createdAt;
+  private BigInteger id;
+  private UUID originClientId;
+  private UUID targetClientId;
+  private UUID targetWalletId;
+  private BigDecimal value;
+  private TransactionStatus status;
+  private TransactionType type;
+  private LocalDateTime createdAt;
 }

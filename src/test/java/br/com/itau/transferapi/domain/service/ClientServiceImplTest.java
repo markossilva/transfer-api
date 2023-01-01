@@ -70,7 +70,7 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void shouldAddWallet_thenThrowException_noFindedClient() {
+    void shouldAddWallet_thenThrowException_noFindClient() {
         final Wallet createdWallet = ClientProvider.getCreatedWallet(UUID.randomUUID());
         when(clientRepository.findById(randomClientID))
                 .thenReturn(Optional.empty());
@@ -161,7 +161,6 @@ public class ClientServiceImplTest {
 
     @Test
     void shouldFindAllTransactions_byWallet_thenThrowException() {
-        final UUID walletID = UUID.randomUUID();
         when(transactionRepository.findAllByClientIdAndWallet(randomClientID, randomWalletID))
                 .thenReturn(Optional.empty());
 

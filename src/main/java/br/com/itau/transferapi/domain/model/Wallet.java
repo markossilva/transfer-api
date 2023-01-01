@@ -9,14 +9,14 @@ import java.util.UUID;
 @Builder(builderMethodName = "internalBuilder")
 @Getter
 public class Wallet {
-    private UUID id;
-    private BigDecimal balance;
-    private WalletStatus status;
-    private UUID clientId;
+  private UUID id;
+  private BigDecimal balance;
+  private WalletStatus status;
+  private UUID clientId;
 
-    public static WalletBuilder builder(final UUID clientId, final UUID walletId) {
-        return internalBuilder()
-                .id(walletId)
-                .clientId(clientId);
-    }
+  public static WalletBuilder builder(final UUID clientId, final UUID walletId) {
+    return internalBuilder()
+        .id(walletId)
+        .clientId(clientId);
+  }
 }

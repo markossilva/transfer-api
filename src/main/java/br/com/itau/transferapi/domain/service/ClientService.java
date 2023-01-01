@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ClientService {
-    UUID createNewClient(final Client client);
+  UUID createNewClient(final Client client);
 
-    Wallet createNewWallet(final UUID customerID, final Wallet wallet);
+  Wallet createNewWallet(final UUID customerID, final Wallet wallet);
 
-    List<Wallet> findAllWallets(final UUID clientID);
+  List<Wallet> findAllWallets(final UUID clientID);
 
-    List<Transaction> findAllTransactions(final UUID clientID);
+  List<Transaction> findAllTransactions(final UUID clientID);
 
-    List<Transaction> findAllTransactionsByWallet(final UUID clientID, final UUID walletID);
+  List<Transaction> findAllTransactionsByWallet(final UUID clientID, final UUID walletID);
 }

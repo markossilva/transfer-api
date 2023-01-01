@@ -18,53 +18,53 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
-    private static final BigDecimal INITIAL_WALLET_BALANCE = BigDecimal.ZERO;
+  private static final BigDecimal INITIAL_WALLET_BALANCE = BigDecimal.ZERO;
 
-    private final ClientRepository clientRepository;
-    private final TransactionRepository transactionRepository;
-    private final WalletRepository walletRepository;
+  private final ClientRepository clientRepository;
+  private final TransactionRepository transactionRepository;
+  private final WalletRepository walletRepository;
 
-    @Override
-    public UUID createNewClient(final Client client) {
-        final Wallet clientWallet = Wallet.builder(client.getId(), UUID.randomUUID())
-                .balance(INITIAL_WALLET_BALANCE)
-                .status(WalletStatus.CREATED)
-                .build();
+  @Override
+  public UUID createNewClient(final Client client) {
+    final Wallet clientWallet = Wallet.builder(client.getId(), UUID.randomUUID())
+        .balance(INITIAL_WALLET_BALANCE)
+        .status(WalletStatus.CREATED)
+        .build();
 
-        client.setWallet(Collections.singletonList(clientWallet));
+    client.setWallet(Collections.singletonList(clientWallet));
 
-        clientRepository.save(client);
+    clientRepository.save(client);
 
-        return client.getId();
+    return client.getId();
+  }
+
+  @Override
+  public Wallet createNewWallet(final UUID clientId, final Wallet wallet) {
+    final Client client = clientRepository.findById(clientId)
+        .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_EXISTS));
+
+    if (!client.getId().equals(wallet.getClientId())) {
+      throw new DomainException(MessageErrors.DIFFERENT_WALLET_CLIENT_ID);
     }
 
-    @Override
-    public Wallet createNewWallet(final UUID clientId, final Wallet wallet) {
-        final Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_EXISTS));
+    return walletRepository.save(wallet);
+  }
 
-        if (!client.getId().equals(wallet.getClientId())) {
-            throw new DomainException(MessageErrors.DIFFERENT_WALLET_CLIENT_ID);
-        }
+  @Override
+  public List<Wallet> findAllWallets(UUID clientId) {
+    return walletRepository.findByClientId(clientId)
+        .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_NO_WALLETS));
+  }
 
-        return walletRepository.save(wallet);
-    }
+  @Override
+  public List<Transaction> findAllTransactions(UUID clientId) {
+    return transactionRepository.findAllByClientId(clientId)
+        .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
+  }
 
-    @Override
-    public List<Wallet> findAllWallets(UUID clientID) {
-        return walletRepository.findByClientId(clientID)
-                .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_NO_WALLETS));
-    }
-
-    @Override
-    public List<Transaction> findAllTransactions(UUID clientID) {
-        return transactionRepository.findAllByClientId(clientID)
-                .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
-    }
-
-    @Override
-    public List<Transaction> findAllTransactionsByWallet(UUID clientID, UUID walletID) {
-        return transactionRepository.findAllByClientIdAndWallet(clientID, walletID)
-                .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
-    }
+  @Override
+  public List<Transaction> findAllTransactionsByWallet(UUID clientId, UUID walletId) {
+    return transactionRepository.findAllByClientIdAndWallet(clientId, walletId)
+        .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
+  }
 }

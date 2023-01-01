@@ -9,8 +9,8 @@ import java.util.UUID;
 @Builder
 @Data
 public class Client {
-    private UUID id;
-    private String name;
-    private List<Wallet> wallet;
-    private List<Transaction> transactions;
+  private UUID id;
+  private String name;
+  private List<Wallet> wallet;
+  private List<Transaction> transactions;
 }
