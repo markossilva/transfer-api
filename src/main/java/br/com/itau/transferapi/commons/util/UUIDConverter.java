@@ -1,4 +1,4 @@
-package br.com.itau.transferapi.commons;
+package br.com.itau.transferapi.commons.util;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
