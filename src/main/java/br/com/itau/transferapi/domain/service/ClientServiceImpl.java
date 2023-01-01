@@ -1,5 +1,6 @@
 package br.com.itau.transferapi.domain.service;
 
+import br.com.itau.transferapi.domain.exception.DomainException;
 import br.com.itau.transferapi.domain.model.Client;
 import br.com.itau.transferapi.domain.model.Transaction;
 import br.com.itau.transferapi.domain.model.Wallet;
@@ -57,18 +58,18 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public List<Wallet> findAllWallets(UUID clientID) {
         return walletRepository.findByClientId(clientID)
-                .orElseThrow(() -> new RuntimeException(CLIENT_HAS_NO_WALLETS));
+                .orElseThrow(() -> new DomainException(CLIENT_HAS_NO_WALLETS));
     }
 
     @Override
     public List<Transaction> findAllTransactions(UUID clientID) {
         return transactionRepository.findAllByClientId(clientID)
-                .orElseThrow(() -> new RuntimeException(CLIENT_HAS_NO_TRANSACTIONS));
+                .orElseThrow(() -> new DomainException(CLIENT_HAS_NO_TRANSACTIONS));
     }
 
     @Override
     public List<Transaction> findAllTransactionsByWallet(UUID clientID, UUID walletID) {
         return transactionRepository.findAllByClientIdAndWallet(clientID, walletID)
-                .orElseThrow(() -> new RuntimeException(CLIENT_HAS_NO_TRANSACTIONS));
+                .orElseThrow(() -> new DomainException(CLIENT_HAS_NO_TRANSACTIONS));
     }
 }
