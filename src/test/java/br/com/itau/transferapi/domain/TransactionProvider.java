@@ -13,18 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class TransactionProvider {
-  public static Transaction getCreatedTransaction(final UUID originClientId, final UUID originWalletId, final UUID targetClientId, final UUID targetWalletId) {
-    return Transaction.builder()
-        .id(BigInteger.ONE)
-        .originClientId(originClientId)
-        .originWalletId(originWalletId)
-        .targetClientId(targetClientId)
-        .targetWalletId(targetWalletId)
-        .status(TransactionStatus.PROCESSING)
-        .amount(BigDecimal.ONE)
-        .date(LocalDateTime.now())
-        .build();
-  }
 
   public static List<Transaction> getCreatedTransactions(
       final UUID originClientId,
