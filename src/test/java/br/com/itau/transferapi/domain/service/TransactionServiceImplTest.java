@@ -55,7 +55,7 @@ public class TransactionServiceImplTest {
     transactionRepository = mock(TransactionRepository.class);
     clientRepository = mock(ClientRepository.class);
 
-    transactionService = new ClientServiceImpl(clientRepository, transactionRepository, walletRepository);
+    transactionService = new ClientServiceImpl(transactionRepository, walletRepository);
     clientService = new ClientServiceImpl(clientRepository, transactionRepository, walletRepository);
 
     walletRepository.save(originWallet);
