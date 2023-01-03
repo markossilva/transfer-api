@@ -20,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
   private static final long CLIENT_TRANSACTION_LIMIT = 1000L;
+  private static final int ZERO_VALUE_COMPARATOR = 0;
   private final WalletRepository walletRepository;
   private final TransactionRepository transactionRepository;
 
@@ -32,12 +33,12 @@ public class TransactionServiceImpl implements TransactionService {
       final Wallet originWallet = getGetWallet(transaction, transaction.getOriginClientId(), transaction.getOriginWalletId());
       final Wallet targetWallet = getGetWallet(transaction, transaction.getTargetClientId(), transaction.getTargetWalletId());
 
-      if (transactionAmount.compareTo(BigDecimal.valueOf(CLIENT_TRANSACTION_LIMIT)) == 0) {
+      if (transactionAmount.compareTo(BigDecimal.valueOf(CLIENT_TRANSACTION_LIMIT)) >= ZERO_VALUE_COMPARATOR) {
         defineTransaction(transaction, TransactionStatus.FAIL, MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION);
         throw new TransactionDomainException(MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION);
       }
 
-      if (originWallet.getBalance().compareTo(transactionAmount) <= 0) {
+      if (originWallet.getBalance().compareTo(transactionAmount) <= ZERO_VALUE_COMPARATOR) {
         defineTransaction(transaction, TransactionStatus.FAIL, MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);
         throw new TransactionDomainException(MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);
       }

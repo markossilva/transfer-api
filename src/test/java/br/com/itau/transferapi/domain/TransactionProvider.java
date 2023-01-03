@@ -157,7 +157,7 @@ public class TransactionProvider {
 
   public static Wallet getCreatedWallet(final UUID clientId, final UUID walletId) {
     return Wallet.builder(clientId, walletId)
-        .balance(BigDecimal.TEN)
+        .balance(BigDecimal.valueOf(20L))
         .status(WalletStatus.ACTIVE)
         .build();
   }

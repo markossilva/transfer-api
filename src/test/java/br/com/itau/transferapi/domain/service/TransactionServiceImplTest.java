@@ -3,6 +3,7 @@ package br.com.itau.transferapi.domain.service;
 import br.com.itau.transferapi.domain.TransactionProvider;
 import br.com.itau.transferapi.domain.model.Transaction;
 import br.com.itau.transferapi.domain.model.Wallet;
+import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
 import br.com.itau.transferapi.infrastracture.repository.memory.MemoryDbWalletRepository;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -37,14 +40,18 @@ public class TransactionServiceImplTest {
   private final Wallet targetWallet = TransactionProvider.getCreatedWallet(targetClientId, targetWalletId);
   private WalletRepository walletRepository;
   private TransactionRepository transactionRepository;
-  private TransactionService service;
+  private ClientRepository clientRepository;
+  private TransactionService transactionService;
+  private ClientService clientService;
 
   @BeforeEach
   void setUp() {
     walletRepository = new MemoryDbWalletRepository();
     transactionRepository = mock(TransactionRepository.class);
+    clientRepository = mock(ClientRepository.class);
 
-    service = new TransactionServiceImpl(walletRepository, transactionRepository);
+    transactionService = new TransactionServiceImpl(walletRepository, transactionRepository);
+    clientService = new ClientServiceImpl(clientRepository, transactionRepository, walletRepository);
 
     walletRepository.save(originWallet);
     walletRepository.save(targetWallet);
@@ -72,7 +79,7 @@ public class TransactionServiceImplTest {
     when(transactionRepository.save(transaction))
         .thenReturn(transaction.getId());
 
-    final BigInteger transactionId = service.doTransaction(transaction);
+    final BigInteger transactionId = transactionService.doTransaction(transaction);
 
     verify(walletRepository, times(2)).save(any(Wallet.class));
     assertEquals(transactionId, transaction.getId());
@@ -100,11 +107,17 @@ public class TransactionServiceImplTest {
     }
 
     log.info("execution time: {} ms", (System.nanoTime() - startTime) / 1_000_000);
+
+    final BigDecimal expectedValue = BigDecimal.valueOf(32L);
+    assertThat(clientService.findAWallet(targetClientId, targetWalletId).getBalance())
+        .describedAs("Verify wallet [%s] balance should be [%d]", targetWalletId, expectedValue)
+        .isEqualTo(expectedValue);
+
   }
 
   private void doTransaction(List<Transaction> partition) {
     partition.forEach(transaction -> {
-      service.doTransaction(transaction);
+      transactionService.doTransaction(transaction);
     });
   }
 }
