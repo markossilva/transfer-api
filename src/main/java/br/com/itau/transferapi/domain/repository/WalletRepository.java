@@ -12,4 +12,6 @@ public interface WalletRepository {
   Optional<List<Wallet>> findByClientId(final UUID clientId);
 
   Wallet save(final Wallet wallet);
+
+  boolean delete(final UUID clientId, final UUID walletId);
 }

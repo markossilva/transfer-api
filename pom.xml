@@ -72,6 +72,7 @@
                     <append>true</append>
                     <excludes>
                         <exclude>*MethodAccess</exclude>
+                        <exclude>**/model/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

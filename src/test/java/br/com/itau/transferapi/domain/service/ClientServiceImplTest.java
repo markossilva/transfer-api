@@ -170,4 +170,16 @@ public class ClientServiceImplTest {
                 .findAllByClientIdAndWallet(any(UUID.class), any(UUID.class));
         assertThrows(RuntimeException.class, executable);
     }
+
+    @Test
+    void shouldFindAllTransactions_findAWallet_thenThrowException() {
+        when(walletRepository.findById(randomClientID, randomWalletID))
+            .thenReturn(Optional.empty());
+
+        final Executable executable = () -> service.findAWallet(randomClientID, randomWalletID);
+
+        verify(transactionRepository, times(0))
+            .findAllByClientIdAndWallet(any(UUID.class), any(UUID.class));
+        assertThrows(RuntimeException.class, executable);
+    }
 }

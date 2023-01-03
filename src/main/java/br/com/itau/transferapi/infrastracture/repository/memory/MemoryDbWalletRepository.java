@@ -35,11 +35,17 @@ public class MemoryDbWalletRepository implements WalletRepository {
       wallets = new ArrayList<>();
     }
 
-    wallets.removeIf(next -> next.getId() == next.getId() && next.getClientId() == wallet.getClientId());
+    wallets.removeIf(next -> next.getId() == wallet.getId() && next.getClientId() == wallet.getClientId());
 
     wallets.add(wallet);
 
     memoryWallet.put(wallet.getClientId(), wallets);
     return wallet;
+  }
+
+  @Override
+  public boolean delete(UUID clientId, UUID walletId) {
+    final List<Wallet> clientWallets = memoryWallet.get(clientId);
+    return clientWallets.removeIf(wallet -> wallet.getClientId() == clientId && wallet.getId() == walletId);
   }
 }

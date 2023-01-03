@@ -2,6 +2,8 @@ package br.com.itau.transferapi.domain.service;
 
 import br.com.itau.transferapi.domain.TransactionProvider;
 import br.com.itau.transferapi.domain.model.Transaction;
+import br.com.itau.transferapi.domain.model.TransactionStatus;
+import br.com.itau.transferapi.domain.model.TransactionType;
 import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
@@ -12,18 +14,21 @@ import org.apache.commons.collections4.ListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @Slf4j
@@ -50,39 +55,11 @@ public class TransactionServiceImplTest {
     transactionRepository = mock(TransactionRepository.class);
     clientRepository = mock(ClientRepository.class);
 
-    transactionService = new TransactionServiceImpl(walletRepository, transactionRepository);
+    transactionService = new ClientServiceImpl(clientRepository, transactionRepository, walletRepository);
     clientService = new ClientServiceImpl(clientRepository, transactionRepository, walletRepository);
 
     walletRepository.save(originWallet);
     walletRepository.save(targetWallet);
-  }
-
-  @Test
-  void shouldCreateTransaction_thenDoTransaction() {
-    final UUID originClientId = UUID.randomUUID();
-    final UUID originWalletId = UUID.randomUUID();
-    final Wallet originWallet = TransactionProvider
-        .getCreatedWallet(originClientId, originWalletId);
-
-    final UUID targetClientId = UUID.randomUUID();
-    final UUID targetWalletId = UUID.randomUUID();
-    final Wallet targetWallet = TransactionProvider
-        .getCreatedWallet(targetClientId, targetWalletId);
-
-    final Transaction transaction = TransactionProvider
-        .getCreatedTransaction(originClientId, originWalletId, targetClientId, targetWalletId);
-
-    when(walletRepository.findById(originClientId, originWalletId))
-        .thenReturn(Optional.of(originWallet));
-    when(walletRepository.findById(targetClientId, targetWalletId))
-        .thenReturn(Optional.of(targetWallet));
-    when(transactionRepository.save(transaction))
-        .thenReturn(transaction.getId());
-
-    final BigInteger transactionId = transactionService.doTransaction(transaction);
-
-    verify(walletRepository, times(2)).save(any(Wallet.class));
-    assertEquals(transactionId, transaction.getId());
   }
 
   @RepeatedTest(10)
@@ -112,12 +89,84 @@ public class TransactionServiceImplTest {
     assertThat(clientService.findAWallet(targetClientId, targetWalletId).getBalance())
         .describedAs("Verify wallet [%s] balance should be [%d]", targetWalletId, expectedValue)
         .isEqualTo(expectedValue);
-
   }
 
   private void doTransaction(List<Transaction> partition) {
     partition.forEach(transaction -> {
       transactionService.doTransaction(transaction);
     });
+  }
+
+  @Test
+  void shouldDoTransaction_moreThanLimitOfTransaction_thenThrowException() {
+    final Executable executable = () -> transactionService.doTransaction(
+        Transaction.builder()
+            .id(BigInteger.ONE)
+            .originClientId(originClientId)
+            .originWalletId(originWalletId)
+            .targetClientId(targetClientId)
+            .targetWalletId(targetWalletId)
+            .amount(BigDecimal.valueOf(1001L))
+            .status(TransactionStatus.PROCESSING)
+            .date(LocalDateTime.now())
+            .build());
+
+    verify(transactionRepository, times(0))
+        .update(any(Transaction.class));
+    assertThrows(RuntimeException.class, executable);
+  }
+
+  @Test
+  void shouldDoTransaction_moreThanWalletAmount_thenThrowException() {
+    final Executable executable = () -> transactionService.doTransaction(
+        Transaction.builder()
+            .id(BigInteger.ONE)
+            .originClientId(originClientId)
+            .originWalletId(originWalletId)
+            .targetClientId(targetClientId)
+            .targetWalletId(targetWalletId)
+            .amount(BigDecimal.valueOf(100L))
+            .status(TransactionStatus.PROCESSING)
+            .date(LocalDateTime.now())
+            .build());
+
+    verify(transactionRepository, times(0))
+        .update(any(Transaction.class));
+    assertThrows(RuntimeException.class, executable);
+  }
+
+  @Test
+  void shouldDoTransaction_whenWalletNotExists_thenThrowException() {
+    walletRepository.delete(targetClientId, targetWalletId);
+
+    final Executable executable = () -> transactionService.doTransaction(
+        Transaction.builder()
+            .id(BigInteger.ONE)
+            .originClientId(originClientId)
+            .originWalletId(originWalletId)
+            .targetClientId(targetClientId)
+            .targetWalletId(targetWalletId)
+            .amount(BigDecimal.ONE)
+            .status(TransactionStatus.PROCESSING)
+            .date(LocalDateTime.now())
+            .build());
+
+    verify(transactionRepository, times(0))
+        .update(any(Transaction.class));
+    assertThrows(RuntimeException.class, executable);
+  }
+
+  @Test
+  void shouldCalculateBalance_thenThrowException() {
+    final Executable executable = () -> getCalculateBalanceMethod()
+        .invoke(transactionService, TransactionType.UNKNOWN, BigDecimal.ZERO, BigDecimal.ZERO);
+
+    assertThrows(InvocationTargetException.class, executable);
+  }
+
+  private Method getCalculateBalanceMethod() throws NoSuchMethodException {
+    Method method = transactionService.getClass().getDeclaredMethod("calculateBalance", TransactionType.class, BigDecimal.class, BigDecimal.class);
+    method.setAccessible(true);
+    return method;
   }
 }
