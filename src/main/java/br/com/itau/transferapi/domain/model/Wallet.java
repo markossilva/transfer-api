@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Builder(builderMethodName = "internalBuilder")
+@Builder(builderMethodName = "internalBuilder", toBuilder = true)
 @Getter
 public class Wallet {
   private UUID id;

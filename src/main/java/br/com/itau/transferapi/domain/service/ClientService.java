@@ -14,6 +14,8 @@ public interface ClientService {
 
   List<Wallet> findAllWallets(final UUID clientID);
 
+  Wallet findAWallet(final UUID clientId, final UUID walletId);
+
   List<Transaction> findAllTransactions(final UUID clientID);
 
   List<Transaction> findAllTransactionsByWallet(final UUID clientID, final UUID walletID);

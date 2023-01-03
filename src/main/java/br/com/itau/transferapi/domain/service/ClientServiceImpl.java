@@ -28,7 +28,7 @@ public class ClientServiceImpl implements ClientService {
   public UUID createNewClient(final Client client) {
     final Wallet clientWallet = Wallet.builder(client.getId(), UUID.randomUUID())
         .balance(INITIAL_WALLET_BALANCE)
-        .status(WalletStatus.CREATED)
+        .status(WalletStatus.ACTIVE)
         .build();
 
     client.setWallet(Collections.singletonList(clientWallet));
@@ -54,6 +54,12 @@ public class ClientServiceImpl implements ClientService {
   public List<Wallet> findAllWallets(UUID clientId) {
     return walletRepository.findByClientId(clientId)
         .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_HAS_NO_WALLETS));
+  }
+
+  @Override
+  public Wallet findAWallet(UUID clientId, UUID walletId) {
+    return walletRepository.findById(clientId, walletId)
+        .orElseThrow(() -> new DomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS));
   }
 
   @Override

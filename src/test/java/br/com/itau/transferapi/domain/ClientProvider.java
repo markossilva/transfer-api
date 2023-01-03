@@ -20,7 +20,7 @@ public class ClientProvider {
 
     public static Wallet getCreatedWallet(final UUID clientID) {
         return Wallet.builder(clientID, UUID.randomUUID())
-                .status(WalletStatus.CREATED)
+                .status(WalletStatus.ACTIVE)
                 .balance(BigDecimal.ZERO)
                 .build();
     }
@@ -30,22 +30,20 @@ public class ClientProvider {
                 Transaction.builder()
                         .id(BigInteger.ONE)
                         .originClientId(originClientId)
-                        .type(TransactionType.SEND)
                         .targetClientId(targetClientId)
                         .targetWalletId(UUID.randomUUID())
-                        .value(BigDecimal.TEN)
+                        .amount(BigDecimal.TEN)
                         .status(TransactionStatus.SUCCESS)
-                        .createdAt(LocalDateTime.now())
+                        .date(LocalDateTime.now())
                         .build(),
                 Transaction.builder()
                         .id(BigInteger.TWO)
                         .originClientId(targetClientId)
-                        .type(TransactionType.RECEIVE)
                         .targetClientId(originClientId)
                         .targetWalletId(UUID.randomUUID())
-                        .value(BigDecimal.TEN)
+                        .amount(BigDecimal.TEN)
                         .status(TransactionStatus.SUCCESS)
-                        .createdAt(LocalDateTime.now())
+                        .date(LocalDateTime.now())
                         .build()
         );
     }
