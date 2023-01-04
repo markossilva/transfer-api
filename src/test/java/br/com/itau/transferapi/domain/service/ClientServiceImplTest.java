@@ -61,6 +61,22 @@ public class ClientServiceImplTest {
   }
 
   @Test
+  void shouldCreateClient_thenThrowException() {
+    final Client client = Client.builder()
+        .id(UUID.randomUUID())
+        .name("ClientName")
+        .build();
+    when(clientRepository.findById(client.getId()))
+        .thenReturn(Optional.of(client));
+
+    final Executable executable = () -> service.createNewClient(client);
+
+    verify(clientRepository, times(0))
+        .save(any(Client.class));
+    assertThrows(RuntimeException.class, executable);
+  }
+
+  @Test
   void shouldCreateWallet_inSavedClient() {
     final Client client = ClientProvider.getCreatedClient();
     final Wallet createdWallet = ClientProvider.getCreatedWallet(client.getId());
@@ -87,8 +103,6 @@ public class ClientServiceImplTest {
         .save(any(Wallet.class));
     assertThrows(RuntimeException.class, executable);
   }
-
-
 
   @Test
   void shouldAddWallet_thenThrowException_differentClientIdFromWallet() {
