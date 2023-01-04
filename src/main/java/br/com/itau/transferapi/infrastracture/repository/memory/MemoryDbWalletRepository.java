@@ -2,11 +2,9 @@ package br.com.itau.transferapi.infrastracture.repository.memory;
 
 import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
 public class MemoryDbWalletRepository implements WalletRepository {
   private static final Map<UUID, List<Wallet>> memoryWallet = new HashMap<>();
 

@@ -8,6 +8,7 @@ import br.com.itau.transferapi.domain.service.ClientService;
 import br.com.itau.transferapi.domain.service.TransactionService;
 import br.com.itau.transferapi.domain.service.impl.ClientServiceImpl;
 import br.com.itau.transferapi.domain.service.impl.TransactionServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,5 +27,10 @@ public class BeanConfiguration {
   ClientService clientService(final ClientRepository clientRepository,
                               final WalletRepository walletRepository) {
     return new ClientServiceImpl(clientRepository, walletRepository);
+  }
+
+  @Bean
+  ObjectMapper mapper() {
+    return new ObjectMapper();
   }
 }
