@@ -48,6 +48,11 @@ public class ClientServiceImpl implements ClientService {
   }
 
   @Override
+  public List<Client> findAllClients() {
+    return clientRepository.findAll();
+  }
+
+  @Override
   public Wallet createNewWallet(final UUID clientId, final Wallet wallet) {
     final Client client = clientRepository.findById(clientId)
         .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_EXISTS));

@@ -14,10 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +55,18 @@ public class ClientServiceImplTest {
     verify(clientRepository).save(any(Client.class));
     assertNotNull(registeredClient.getClientId());
     assertNotNull(registeredClient.getWalletId());
+  }
+
+  @Test
+  void shouldFindAllClients_thenFind() {
+    final List<Client> createdClient = Collections
+        .singletonList(ClientProvider.getCreatedClient());
+    when(clientRepository.findAll())
+        .thenReturn(createdClient);
+
+    final List<Client> allClients = service.findAllClients();
+
+    assertTrue(allClients.containsAll(createdClient));
   }
 
   @Test
