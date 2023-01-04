@@ -13,7 +13,8 @@ import java.util.UUID;
 @Entity
 @Table(name = WalletEntity.TABLE)
 class WalletEntity {
-  static final String TABLE = "tbl_wallet";
+  static final String TABLE = "tbl_wallet",
+      CLIENT_JOIN = "client_id";
 
   @Id
   private UUID id;
@@ -25,6 +26,6 @@ class WalletEntity {
   private WalletStatus status;
 
   @ManyToOne
-  @JoinColumn(name = "client_id", nullable = false)
+  @JoinColumn(name = CLIENT_JOIN, nullable = false)
   private ClientEntity client;
 }

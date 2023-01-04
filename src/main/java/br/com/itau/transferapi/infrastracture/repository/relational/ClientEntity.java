@@ -15,16 +15,17 @@ import java.util.UUID;
 @Entity
 @Table(name = ClientEntity.TABLE)
 class ClientEntity {
-  static final String TABLE = "tbl_client";
+  static final String TABLE = "tbl_client",
+  CLIENT_JOIN = "client";
 
   @Id
   private UUID id;
 
   private String name;
 
-  @OneToMany(mappedBy = "client")
+  @OneToMany(mappedBy = CLIENT_JOIN)
   private List<WalletEntity> wallets;
 
-  @OneToMany(mappedBy = "client")
+  @OneToMany(mappedBy = CLIENT_JOIN)
   private List<TransactionEntity> transactions;
 }

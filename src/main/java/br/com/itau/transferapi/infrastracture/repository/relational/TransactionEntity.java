@@ -14,7 +14,6 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = TransactionEntity.TABLE)
-//@IdClass(TransactionId.class)
 class TransactionEntity {
   static final String TABLE = "tbl_transaction",
       TARGET_WALLET_ID = "target_wallet_id",
@@ -25,26 +24,18 @@ class TransactionEntity {
   @Id
   private BigInteger id;
 
-//  @Id
-//  @Column(name = "client_id")
-//  private UUID clientId;
-//
-//  @Id
-//  @Column(name = "wallet_id")
-//  private UUID walletId;
-
   @ManyToOne
-  @JoinColumn(name = TransactionEntity.JOIN_CLIENT_ID, nullable = false)
+  @JoinColumn(name = JOIN_CLIENT_ID, nullable = false)
   private ClientEntity client;
 
   @ManyToOne
-  @JoinColumn(name = TransactionEntity.JOIN_WALLET_ID, nullable = false)
+  @JoinColumn(name = JOIN_WALLET_ID, nullable = false)
   private WalletEntity wallet;
 
-  @Column(name = TransactionEntity.TARGET_CLIENT_ID, nullable = false)
+  @Column(name = TARGET_CLIENT_ID, nullable = false)
   private UUID targetClientId;
 
-  @Column(name = TransactionEntity.TARGET_WALLET_ID, nullable = false)
+  @Column(name = TARGET_WALLET_ID, nullable = false)
   private UUID targetWalletId;
 
   @Column(nullable = false)
