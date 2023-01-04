@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class ClientServiceImpl implements ClientService {
         .status(WalletStatus.ACTIVE)
         .build();
 
-    client.setWallet(clientWallet);
+    client.setWallets(Collections.singletonList(clientWallet));
 
     clientRepository.save(client);
 

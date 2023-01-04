@@ -13,6 +13,6 @@ import java.util.UUID;
 public class Client {
   private UUID id;
   private String name;
-  private Wallet wallet;
+  private List<Wallet> wallets;
   private List<Transaction> transactions;
 }
