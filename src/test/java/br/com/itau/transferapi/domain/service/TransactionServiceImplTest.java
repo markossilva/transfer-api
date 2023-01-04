@@ -8,6 +8,8 @@ import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
+import br.com.itau.transferapi.domain.service.impl.ClientServiceImpl;
+import br.com.itau.transferapi.domain.service.impl.TransactionServiceImpl;
 import br.com.itau.transferapi.infrastracture.repository.memory.MemoryDbWalletRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
@@ -55,8 +57,8 @@ public class TransactionServiceImplTest {
     transactionRepository = mock(TransactionRepository.class);
     clientRepository = mock(ClientRepository.class);
 
-    transactionService = new ClientServiceImpl(transactionRepository, walletRepository);
-    clientService = new ClientServiceImpl(clientRepository, transactionRepository, walletRepository);
+    transactionService = new TransactionServiceImpl(transactionRepository, walletRepository);
+    clientService = new ClientServiceImpl(clientRepository, walletRepository);
 
     walletRepository.save(originWallet);
     walletRepository.save(targetWallet);
@@ -87,8 +89,13 @@ public class TransactionServiceImplTest {
 
     final BigDecimal expectedValue = BigDecimal.valueOf(32L);
     assertThat(clientService.findAWallet(targetClientId, targetWalletId).getBalance())
-        .describedAs("Verify wallet [%s] balance should be [%d]", targetWalletId, expectedValue)
+        .describedAs("Verify target wallet [%s] balance should be [%d]", targetWalletId, expectedValue)
         .isEqualTo(expectedValue);
+
+    final BigDecimal expectedOriginValue = BigDecimal.valueOf(8L);
+    assertThat(clientService.findAWallet(originClientId, originWalletId).getBalance())
+        .describedAs("Verify origin wallet [%s] balance should be [%d]", originWallet, expectedOriginValue)
+        .isEqualTo(expectedOriginValue);
   }
 
   private void doTransaction(List<Transaction> partition) {

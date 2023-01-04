@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 public class ApplicationTest {
 
-    @Test
-    void applicationContextLoads() {
-        Application.main(new String[]{});
-        assertTrue(true);
-    }
+  @Test
+  void applicationContextLoads() {
+    Application.main(new String[]{});
+    assertTrue(true);
+  }
 }

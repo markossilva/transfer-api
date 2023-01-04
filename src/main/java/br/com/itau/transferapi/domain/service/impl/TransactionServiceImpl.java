@@ -1,95 +1,31 @@
-package br.com.itau.transferapi.domain.service;
+package br.com.itau.transferapi.domain.service.impl;
 
 import br.com.itau.transferapi.domain.exception.ClientDomainException;
 import br.com.itau.transferapi.domain.exception.MessageErrors;
 import br.com.itau.transferapi.domain.exception.TransactionDomainException;
-import br.com.itau.transferapi.domain.model.*;
-import br.com.itau.transferapi.domain.repository.ClientRepository;
+import br.com.itau.transferapi.domain.model.Transaction;
+import br.com.itau.transferapi.domain.model.TransactionStatus;
+import br.com.itau.transferapi.domain.model.TransactionType;
+import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
+import br.com.itau.transferapi.domain.service.TransactionService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-public class ClientServiceImpl implements ClientService, TransactionService {
-  private static final BigDecimal INITIAL_WALLET_BALANCE = BigDecimal.ZERO;
+@RequiredArgsConstructor
+public class TransactionServiceImpl implements TransactionService {
   private static final long CLIENT_TRANSACTION_LIMIT = 1000L;
   private static final int ZERO_VALUE_COMPARATOR = 0;
-
-  private final ClientRepository clientRepository;
   private final TransactionRepository transactionRepository;
   private final WalletRepository walletRepository;
-
-  public ClientServiceImpl(final ClientRepository clientRepository,
-                           final TransactionRepository transactionRepository,
-                           final WalletRepository walletRepository) {
-    this.clientRepository = clientRepository;
-    this.transactionRepository = transactionRepository;
-    this.walletRepository = walletRepository;
-  }
-
-  public ClientServiceImpl(final TransactionRepository transactionRepository,
-                           final WalletRepository walletRepository) {
-    this.transactionRepository = transactionRepository;
-    this.walletRepository = walletRepository;
-    this.clientRepository = null;
-  }
-
-  @Override
-  public UUID createNewClient(final Client client) {
-    final Wallet clientWallet = Wallet.builder(client.getId(), UUID.randomUUID())
-        .balance(INITIAL_WALLET_BALANCE)
-        .status(WalletStatus.ACTIVE)
-        .build();
-
-    client.setWallet(Collections.singletonList(clientWallet));
-
-    clientRepository.save(client);
-
-    return client.getId();
-  }
-
-  @Override
-  public Wallet createNewWallet(final UUID clientId, final Wallet wallet) {
-    final Client client = clientRepository.findById(clientId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_EXISTS));
-
-    if (!client.getId().equals(wallet.getClientId())) {
-      throw new ClientDomainException(MessageErrors.DIFFERENT_WALLET_CLIENT_ID);
-    }
-
-    return walletRepository.save(wallet);
-  }
-
-  @Override
-  public List<Wallet> findAllWallets(UUID clientId) {
-    return walletRepository.findByClientId(clientId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_WALLETS));
-  }
-
-  @Override
-  public Wallet findAWallet(UUID clientId, UUID walletId) {
-    return walletRepository.findById(clientId, walletId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS));
-  }
-
-  @Override
-  public List<Transaction> findAllTransactions(UUID clientId) {
-    return transactionRepository.findAllByClientId(clientId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
-  }
-
-  @Override
-  public List<Transaction> findAllTransactionsByWallet(UUID clientId, UUID walletId) {
-    return transactionRepository.findAllByClientIdAndWallet(clientId, walletId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
-  }
 
   @Override
   public BigInteger doTransaction(Transaction transaction) {
@@ -157,5 +93,17 @@ public class ClientServiceImpl implements ClientService, TransactionService {
     }
 
     return newBalance;
+  }
+
+  @Override
+  public List<Transaction> findAllTransactions(UUID clientId) {
+    return transactionRepository.findAllByClientId(clientId)
+        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
+  }
+
+  @Override
+  public List<Transaction> findAllTransactionsByWallet(UUID clientId, UUID walletId) {
+    return transactionRepository.findAllByClientIdAndWallet(clientId, walletId)
+        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
   }
 }

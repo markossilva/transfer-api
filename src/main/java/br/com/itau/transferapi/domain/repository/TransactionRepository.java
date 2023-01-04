@@ -13,5 +13,6 @@ public interface TransactionRepository {
   Optional<List<Transaction>> findAllByClientIdAndWallet(UUID clientID, UUID walletID);
 
   BigInteger save(Transaction transaction);
+
   Transaction update(Transaction transaction);
 }
