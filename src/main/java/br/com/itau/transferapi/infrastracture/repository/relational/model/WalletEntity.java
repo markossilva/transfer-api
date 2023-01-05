@@ -33,7 +33,8 @@ class WalletEntity {
   @JoinColumn(name = CLIENT_JOIN, nullable = false, insertable = false, updatable = false)
   private ClientEntity client;
 
-  public WalletEntity() {}
+  public WalletEntity() {
+  }
 
   public WalletEntity(UUID id, BigDecimal balance, WalletStatus status, UUID walletClientId, ClientEntity client) {
     this.id = id;

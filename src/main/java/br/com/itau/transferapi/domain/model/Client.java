@@ -1,6 +1,8 @@
 package br.com.itau.transferapi.domain.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +16,9 @@ public class Client {
   private List<Wallet> wallets;
   private List<Transaction> transactions;
 
-  public Client() {}
+  public Client() {
+  }
+
   public Client(UUID id, String name, List<Wallet> wallets, List<Transaction> transactions) {
     this.id = id;
     this.name = name;

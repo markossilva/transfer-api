@@ -8,7 +8,6 @@ import br.com.itau.transferapi.domain.service.ClientService;
 import br.com.itau.transferapi.domain.service.TransactionService;
 import br.com.itau.transferapi.domain.service.impl.ClientServiceImpl;
 import br.com.itau.transferapi.domain.service.impl.TransactionServiceImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

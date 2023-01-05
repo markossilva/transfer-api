@@ -16,7 +16,7 @@ import java.util.UUID;
 @Table(name = ClientEntity.TABLE)
 public class ClientEntity {
   static final String TABLE = "tbl_client",
-  CLIENT_JOIN = "client";
+      CLIENT_JOIN = "client";
 
   @Id
   private UUID id;
@@ -29,7 +29,9 @@ public class ClientEntity {
   @OneToMany(mappedBy = CLIENT_JOIN)
   private List<TransactionEntity> transactions;
 
-  public ClientEntity(){}
+  public ClientEntity() {
+  }
+
   public ClientEntity(UUID id, String name, List<WalletEntity> wallets, List<TransactionEntity> transactions) {
     this.id = id;
     this.name = name;

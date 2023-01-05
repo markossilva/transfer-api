@@ -16,7 +16,9 @@ public class Wallet {
   private WalletStatus status;
   private UUID clientId;
 
-  public Wallet() {}
+  public Wallet() {
+  }
+
   public Wallet(UUID id, BigDecimal balance, WalletStatus status, UUID clientId) {
     this.id = id;
     this.balance = balance;

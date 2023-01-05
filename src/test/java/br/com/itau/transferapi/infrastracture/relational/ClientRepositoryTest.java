@@ -3,16 +3,15 @@ package br.com.itau.transferapi.infrastracture.relational;
 import br.com.itau.transferapi.domain.model.Client;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.infrastracture.repository.relational.ClientDbRepository;
-import br.com.itau.transferapi.infrastracture.repository.relational.model.ClientEntity;
 import br.com.itau.transferapi.infrastracture.repository.relational.ClientJpaRepository;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.ClientEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -71,8 +70,8 @@ public class ClientRepositoryTest {
         .thenReturn(Collections.singletonList(clientEntity));
 
     final List<Client> all = clientDbRepository.findAll();
-    assertTrue(all.stream().findFirst().get()
-        .getId().equals(clientEntity
-            .getId()));
+    assertEquals(all.stream().findFirst().get()
+        .getId(), clientEntity
+        .getId());
   }
 }

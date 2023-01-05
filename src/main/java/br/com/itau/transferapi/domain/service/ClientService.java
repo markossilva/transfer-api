@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface ClientService {
   RegisteredClient createNewClient(final Client client);
+
   List<Client> findAllClients();
 
   Wallet createNewWallet(final UUID customerID, final Wallet wallet);

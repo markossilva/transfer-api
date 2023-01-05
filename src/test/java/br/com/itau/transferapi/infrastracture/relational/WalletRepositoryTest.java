@@ -4,8 +4,8 @@ import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.model.WalletStatus;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
 import br.com.itau.transferapi.infrastracture.repository.relational.WalletDbRepository;
-import br.com.itau.transferapi.infrastracture.repository.relational.model.WalletEntity;
 import br.com.itau.transferapi.infrastracture.repository.relational.WalletJpaRepository;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.WalletEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -21,15 +21,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class WalletRepositoryTest {
+  private static final int WHEN_DELETE_SUCCESS = 0;
+  private static final int WHEN_DELETE_FAIL = 1;
   private WalletJpaRepository walletJpaRepository;
   private WalletRepository walletRepository;
-
   private UUID clientId;
   private UUID walletId;
   private WalletEntity walletEntity;
   private Wallet wallet;
-  private static final int WHEN_DELETE_SUCCESS = 0;
-  private static final int WHEN_DELETE_FAIL = 1;
 
   @BeforeEach
   void setUp() {
@@ -111,6 +110,6 @@ public class WalletRepositoryTest {
     verify(walletJpaRepository)
         .updateWalletSetStatusForClientIdAndWalletId(
             any(WalletStatus.class), any(UUID.class), any(UUID.class));
-    assertTrue(!delete);
+    assertFalse(delete);
   }
 }

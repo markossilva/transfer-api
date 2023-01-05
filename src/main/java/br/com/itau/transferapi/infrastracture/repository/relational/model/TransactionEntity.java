@@ -57,7 +57,8 @@ class TransactionEntity {
 
   private LocalDateTime date;
 
-  public TransactionEntity() {}
+  public TransactionEntity() {
+  }
 
   public TransactionEntity(BigInteger id, UUID originClientId, UUID originWalletId,
                            ClientEntity client, WalletEntity wallet, UUID targetClientId,

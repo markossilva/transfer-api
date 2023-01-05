@@ -3,7 +3,6 @@ package br.com.itau.transferapi.domain.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Value;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -24,7 +23,9 @@ public class Transaction {
   String cause;
   LocalDateTime date;
 
-  public Transaction() {}
+  public Transaction() {
+  }
+
   public Transaction(BigInteger id, UUID originClientId,
                      UUID originWalletId, UUID targetClientId,
                      UUID targetWalletId, BigDecimal amount,
