@@ -1,4 +1,4 @@
-package br.com.itau.transferapi.infrastracture.repository.relational;
+package br.com.itau.transferapi.infrastracture.repository.relational.model;
 
 import br.com.itau.transferapi.domain.model.TransactionStatus;
 import lombok.Builder;

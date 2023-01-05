@@ -1,9 +1,8 @@
-package br.com.itau.transferapi.infrastracture.repository.relational;
+package br.com.itau.transferapi.infrastracture.repository.relational.model;
 
 import br.com.itau.transferapi.domain.model.WalletStatus;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -28,7 +27,7 @@ class WalletEntity {
   private WalletStatus status;
 
   @Column(name = CLIENT_JOIN)
-  private UUID clientId;
+  private UUID walletClientId;
 
   @ManyToOne(targetEntity = ClientEntity.class, fetch = FetchType.EAGER)
   @JoinColumn(name = CLIENT_JOIN, nullable = false, insertable = false, updatable = false)
@@ -36,11 +35,11 @@ class WalletEntity {
 
   public WalletEntity() {}
 
-  public WalletEntity(UUID id, BigDecimal balance, WalletStatus status, UUID clientId, ClientEntity client) {
+  public WalletEntity(UUID id, BigDecimal balance, WalletStatus status, UUID walletClientId, ClientEntity client) {
     this.id = id;
     this.balance = balance;
     this.status = status;
-    this.clientId = clientId;
+    this.walletClientId = walletClientId;
     this.client = client;
   }
 

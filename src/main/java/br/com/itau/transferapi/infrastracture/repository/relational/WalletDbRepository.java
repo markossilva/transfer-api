@@ -1,11 +1,10 @@
 package br.com.itau.transferapi.infrastracture.repository.relational;
 
-import br.com.itau.transferapi.domain.model.Transaction;
 import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.model.WalletStatus;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.WalletEntity;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 public class WalletDbRepository implements WalletRepository {
 
   private static final int NUMBER_OF_ROWS = 0;
-//  private final TypeMap<WalletEntity, Wallet> entityToDomain;
   private final WalletJpaRepository walletJpaRepository;
   private final ModelMapper mapper;
 
@@ -26,13 +24,13 @@ public class WalletDbRepository implements WalletRepository {
   public WalletDbRepository(WalletJpaRepository walletJpaRepository, ModelMapper mapper) {
     this.walletJpaRepository = walletJpaRepository;
     this.mapper = mapper;
-//    this.entityToDomain = mapper.createTypeMap(WalletEntity.class, Wallet.class)
-//        .addMappings(to -> {
-//          to.map(WalletEntity::getId, Wallet::setId);
-//          to.map(WalletEntity::getBalance, Wallet::setBalance);
-//          to.map(WalletEntity::getStatus, Wallet::setStatus);
-//          to.map(WalletEntity::getClientId, Wallet::setClientId);
-//        });
+    mapper.createTypeMap(WalletEntity.class, Wallet.class)
+        .addMappings(to -> {
+          to.map(WalletEntity::getId, Wallet::setId);
+          to.map(WalletEntity::getBalance, Wallet::setBalance);
+          to.map(WalletEntity::getStatus, Wallet::setStatus);
+          to.map(WalletEntity::getWalletClientId, Wallet::setClientId);
+        });
   }
 
   @Override
@@ -60,6 +58,6 @@ public class WalletDbRepository implements WalletRepository {
   public boolean delete(UUID clientId, UUID walletId) {
     return walletJpaRepository
         .updateWalletSetStatusForClientIdAndWalletId(
-            WalletStatus.INACTIVE, walletId, clientId) > NUMBER_OF_ROWS;
+            WalletStatus.INACTIVE, walletId, clientId) == NUMBER_OF_ROWS;
   }
 }

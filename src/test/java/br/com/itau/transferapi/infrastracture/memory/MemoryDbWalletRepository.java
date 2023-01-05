@@ -1,4 +1,4 @@
-package br.com.itau.transferapi.infrastracture.repository.memory;
+package br.com.itau.transferapi.infrastracture.memory;
 
 import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.repository.WalletRepository;

@@ -5,6 +5,9 @@ import br.com.itau.transferapi.domain.model.TransactionStatus;
 import br.com.itau.transferapi.domain.model.WalletStatus;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.infrastracture.repository.relational.*;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.ClientEntity;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.TransactionEntity;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.WalletEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -87,7 +90,7 @@ public class TransactionRepositoryTest {
   }
 
   @Test
-  void whenFindAllByClientIdAndWallet_thenReturnAllTransactions() {
+  void whenFindByClientIdAndWallet_thenReturnATransactions() {
     when(transactionJpaRepository.findAllByClientIdAndWallet(clientId, walletId))
         .thenReturn(transactionEntity);
 

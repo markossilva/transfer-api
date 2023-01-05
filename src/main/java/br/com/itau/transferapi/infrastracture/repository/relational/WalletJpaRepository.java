@@ -1,6 +1,7 @@
 package br.com.itau.transferapi.infrastracture.repository.relational;
 
 import br.com.itau.transferapi.domain.model.WalletStatus;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.WalletEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

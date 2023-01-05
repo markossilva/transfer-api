@@ -10,7 +10,7 @@ import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
 import br.com.itau.transferapi.domain.service.impl.ClientServiceImpl;
 import br.com.itau.transferapi.domain.service.impl.TransactionServiceImpl;
-import br.com.itau.transferapi.infrastracture.repository.memory.MemoryDbWalletRepository;
+import br.com.itau.transferapi.infrastracture.memory.MemoryDbWalletRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.junit.jupiter.api.BeforeEach;

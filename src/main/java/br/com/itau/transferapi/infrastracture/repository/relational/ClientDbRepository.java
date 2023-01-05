@@ -2,6 +2,7 @@ package br.com.itau.transferapi.infrastracture.repository.relational;
 
 import br.com.itau.transferapi.domain.model.Client;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.ClientEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

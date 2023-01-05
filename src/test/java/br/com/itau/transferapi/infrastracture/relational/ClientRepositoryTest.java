@@ -3,7 +3,7 @@ package br.com.itau.transferapi.infrastracture.relational;
 import br.com.itau.transferapi.domain.model.Client;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.infrastracture.repository.relational.ClientDbRepository;
-import br.com.itau.transferapi.infrastracture.repository.relational.ClientEntity;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.ClientEntity;
 import br.com.itau.transferapi.infrastracture.repository.relational.ClientJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

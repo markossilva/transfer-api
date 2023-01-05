@@ -2,12 +2,11 @@ package br.com.itau.transferapi.infrastracture.repository.relational;
 
 import br.com.itau.transferapi.domain.model.Transaction;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
+import br.com.itau.transferapi.infrastracture.repository.relational.model.TransactionEntity;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 @Component
 public class TransactionDbRepository implements TransactionRepository {
 
-  private final TypeMap<TransactionEntity, Transaction> entityToDomain;
   private final TransactionJpaRepository transactionJpaRepository;
   private final ModelMapper mapper;
 
@@ -24,7 +22,7 @@ public class TransactionDbRepository implements TransactionRepository {
   public TransactionDbRepository(TransactionJpaRepository transactionJpaRepository, ModelMapper mapper) {
     this.transactionJpaRepository = transactionJpaRepository;
     this.mapper = mapper;
-    this.entityToDomain = mapper.createTypeMap(TransactionEntity.class, Transaction.class)
+    mapper.createTypeMap(TransactionEntity.class, Transaction.class)
         .addMappings(to -> {
           to.map(TransactionEntity::getId, Transaction::setId);
           to.map(src -> src.getClient().getId(), Transaction::setOriginClientId);
@@ -42,14 +40,14 @@ public class TransactionDbRepository implements TransactionRepository {
   public Optional<List<Transaction>> findAllByClientId(UUID clientID) {
     return Optional.of(transactionJpaRepository.findAllByClientId(clientID)
         .stream()
-        .map(this.entityToDomain::map)
+        .map(transactionEntity -> mapper.map(transactionEntity, Transaction.class))
         .collect(Collectors.toList()));
   }
 
   @Override
   public Optional<Transaction> findAllByClientIdAndWallet(UUID clientID, UUID walletID) {
-    return Optional.of(this.entityToDomain.map(transactionJpaRepository
-        .findAllByClientIdAndWallet(clientID, walletID)));
+    return Optional.of(mapper.map(transactionJpaRepository
+        .findAllByClientIdAndWallet(clientID, walletID), Transaction.class));
   }
 
   @Override
