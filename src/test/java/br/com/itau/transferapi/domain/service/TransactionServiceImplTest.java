@@ -119,7 +119,7 @@ public class TransactionServiceImplTest {
             .build());
 
     verify(transactionRepository, times(0))
-        .update(any(Transaction.class));
+        .save(any(Transaction.class));
     assertThrows(RuntimeException.class, executable);
   }
 
@@ -138,7 +138,7 @@ public class TransactionServiceImplTest {
             .build());
 
     verify(transactionRepository, times(0))
-        .update(any(Transaction.class));
+        .save(any(Transaction.class));
     assertThrows(RuntimeException.class, executable);
   }
 
@@ -159,7 +159,7 @@ public class TransactionServiceImplTest {
             .build());
 
     verify(transactionRepository, times(0))
-        .update(any(Transaction.class));
+        .save(any(Transaction.class));
     assertThrows(RuntimeException.class, executable);
   }
 

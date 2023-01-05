@@ -178,16 +178,16 @@ public class ClientServiceImplTest {
 
   @Test
   void shouldFindAllTransactions_byWallet() {
-    final List<Transaction> providedTransactions = ClientProvider
-        .getCreatedTransactions(randomClientID, randomWalletID);
+    final Transaction providedTransactions = ClientProvider
+        .getCreatedTransaction(randomClientID, randomWalletID);
     when(transactionRepository.findAllByClientIdAndWallet(randomClientID, randomWalletID))
         .thenReturn(Optional.of(providedTransactions));
 
-    final List<Transaction> allTransactions = transactionService
+    final Transaction allTransactions = transactionService
         .findAllTransactionsByWallet(randomClientID, randomWalletID);
 
     verify(transactionRepository).findAllByClientIdAndWallet(randomClientID, randomWalletID);
-    assertTrue(allTransactions.containsAll(providedTransactions));
+    assertTrue(allTransactions.getOriginWalletId().equals(providedTransactions.getOriginWalletId()));
   }
 
   @Test

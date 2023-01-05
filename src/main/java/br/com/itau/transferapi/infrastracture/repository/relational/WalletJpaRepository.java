@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-interface WalletJpaRepository extends JpaRepository<WalletEntity, UUID> {
+public interface WalletJpaRepository extends JpaRepository<WalletEntity, UUID> {
   @Modifying
   @Query("update WalletEntity w set w.status = :status where w.id = :walletId and w.client.id = :clientId")
   int updateWalletSetStatusForClientIdAndWalletId(

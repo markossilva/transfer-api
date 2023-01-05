@@ -2,7 +2,7 @@ package br.com.itau.transferapi.infrastracture.repository.relational;
 
 import br.com.itau.transferapi.domain.model.Client;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +12,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+public
 class ClientDbRepository implements ClientRepository {
 
   private final ClientJpaRepository clientJpaRepository;
-  private final ObjectMapper mapper;
+  private final ModelMapper mapper;
 
   @Autowired
-  public ClientDbRepository(ClientJpaRepository clientJpaRepository, ObjectMapper mapper) {
+  public ClientDbRepository(ClientJpaRepository clientJpaRepository, ModelMapper mapper) {
     this.clientJpaRepository = clientJpaRepository;
     this.mapper = mapper;
   }
@@ -26,19 +27,19 @@ class ClientDbRepository implements ClientRepository {
   @Override
   public Optional<Client> findById(UUID id) {
     return clientJpaRepository.findById(id)
-        .map(clientEntity -> mapper.convertValue(clientEntity, Client.class));
+        .map(clientEntity -> mapper.map(clientEntity, Client.class));
   }
 
   @Override
   public void save(Client client) {
-    clientJpaRepository.save(mapper.convertValue(client, ClientEntity.class));
+    clientJpaRepository.save(mapper.map(client, ClientEntity.class));
   }
 
   @Override
   public List<Client> findAll() {
     return clientJpaRepository.findAll()
         .stream()
-        .map(clientEntity -> mapper.convertValue(clientEntity, Client.class))
+        .map(clientEntity -> mapper.map(clientEntity, Client.class))
         .collect(Collectors.toList());
   }
 }

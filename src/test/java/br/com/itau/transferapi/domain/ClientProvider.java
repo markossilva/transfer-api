@@ -19,7 +19,9 @@ public class ClientProvider {
   }
 
   public static Wallet getCreatedWallet(final UUID clientID) {
-    return Wallet.builder(clientID, UUID.randomUUID())
+    return Wallet.builder()
+        .id(UUID.randomUUID())
+        .clientId(clientID)
         .status(WalletStatus.ACTIVE)
         .balance(BigDecimal.ZERO)
         .build();
@@ -46,5 +48,18 @@ public class ClientProvider {
             .date(LocalDateTime.now())
             .build()
     );
+  }
+
+  public static Transaction getCreatedTransaction(final UUID originClientId, final UUID targetClientId) {
+    return Transaction.builder()
+        .id(BigInteger.ONE)
+        .originClientId(originClientId)
+        .originWalletId(UUID.randomUUID())
+        .targetClientId(targetClientId)
+        .targetWalletId(UUID.randomUUID())
+        .amount(BigDecimal.TEN)
+        .status(TransactionStatus.SUCCESS)
+        .date(LocalDateTime.now())
+        .build();
   }
 }

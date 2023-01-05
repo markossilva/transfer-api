@@ -7,10 +7,10 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
-interface TransactionJpaRepository extends JpaRepository<TransactionEntity, BigInteger> {
+public interface TransactionJpaRepository extends JpaRepository<TransactionEntity, BigInteger> {
   @Query("SELECT u FROM TransactionEntity u WHERE u.client.id = ?1")
   List<TransactionEntity> findAllByClientId(UUID clientID);
 
   @Query("SELECT u FROM TransactionEntity u WHERE u.client.id = ?1 and u.wallet.id = ?2")
-  List<TransactionEntity> findAllByClientIdAndWallet(UUID clientID, UUID walletID);
+  TransactionEntity findAllByClientIdAndWallet(UUID clientID, UUID walletID);
 }

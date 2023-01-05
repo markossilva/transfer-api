@@ -1,9 +1,11 @@
 package br.com.itau.transferapi.infrastracture.repository.relational;
 
+import br.com.itau.transferapi.domain.model.Transaction;
 import br.com.itau.transferapi.domain.model.Wallet;
 import br.com.itau.transferapi.domain.model.WalletStatus;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,21 +15,29 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-class WalletDbRepository implements WalletRepository {
+public class WalletDbRepository implements WalletRepository {
 
   private static final int NUMBER_OF_ROWS = 0;
+//  private final TypeMap<WalletEntity, Wallet> entityToDomain;
   private final WalletJpaRepository walletJpaRepository;
-  private final ObjectMapper mapper;
+  private final ModelMapper mapper;
 
   @Autowired
-  public WalletDbRepository(WalletJpaRepository walletJpaRepository, ObjectMapper mapper) {
+  public WalletDbRepository(WalletJpaRepository walletJpaRepository, ModelMapper mapper) {
     this.walletJpaRepository = walletJpaRepository;
     this.mapper = mapper;
+//    this.entityToDomain = mapper.createTypeMap(WalletEntity.class, Wallet.class)
+//        .addMappings(to -> {
+//          to.map(WalletEntity::getId, Wallet::setId);
+//          to.map(WalletEntity::getBalance, Wallet::setBalance);
+//          to.map(WalletEntity::getStatus, Wallet::setStatus);
+//          to.map(WalletEntity::getClientId, Wallet::setClientId);
+//        });
   }
 
   @Override
   public Optional<Wallet> findById(UUID clientId, UUID walletId) {
-    return Optional.of(mapper.convertValue(walletJpaRepository
+    return Optional.of(mapper.map(walletJpaRepository
         .findByClientAndWallet(clientId, walletId), Wallet.class));
   }
 
@@ -35,14 +45,14 @@ class WalletDbRepository implements WalletRepository {
   public Optional<List<Wallet>> findByClientId(UUID clientId) {
     return Optional.of(walletJpaRepository.findByClientId(clientId)
         .stream()
-        .map(walletEntity -> mapper.convertValue(walletEntity, Wallet.class))
+        .map(walletEntity -> mapper.map(walletEntity, Wallet.class))
         .collect(Collectors.toList()));
   }
 
   @Override
   public Wallet save(Wallet wallet) {
     walletJpaRepository
-        .save(mapper.convertValue(wallet, WalletEntity.class));
+        .save(mapper.map(wallet, WalletEntity.class));
     return wallet;
   }
 

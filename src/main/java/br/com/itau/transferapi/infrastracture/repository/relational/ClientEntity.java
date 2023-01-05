@@ -1,6 +1,8 @@
 package br.com.itau.transferapi.infrastracture.repository.relational;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
@@ -11,10 +13,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
 @Entity
+@Builder
 @Table(name = ClientEntity.TABLE)
-class ClientEntity {
+public class ClientEntity {
   static final String TABLE = "tbl_client",
   CLIENT_JOIN = "client";
 
@@ -28,4 +30,12 @@ class ClientEntity {
 
   @OneToMany(mappedBy = CLIENT_JOIN)
   private List<TransactionEntity> transactions;
+
+  public ClientEntity(){}
+  public ClientEntity(UUID id, String name, List<WalletEntity> wallets, List<TransactionEntity> transactions) {
+    this.id = id;
+    this.name = name;
+    this.wallets = wallets;
+    this.transactions = transactions;
+  }
 }

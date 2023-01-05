@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TransactionService {
-  BigInteger doTransaction(Transaction transaction);
+  Transaction doTransaction(Transaction transaction);
 
   List<Transaction> findAllTransactions(final UUID clientID);
 
-  List<Transaction> findAllTransactionsByWallet(final UUID clientID, final UUID walletID);
+  Transaction findAllTransactionsByWallet(final UUID clientID, final UUID walletID);
 }

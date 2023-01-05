@@ -33,7 +33,9 @@ public class ClientServiceImpl implements ClientService {
       throw new ClientDomainException(MessageErrors.CLIENT_ALREADY_REGISTERED);
     });
 
-    final Wallet clientWallet = Wallet.builder(clientId, UUID.randomUUID())
+    final Wallet clientWallet = Wallet.builder()
+        .id(UUID.randomUUID())
+        .clientId(clientId)
         .balance(INITIAL_WALLET_BALANCE)
         .status(WalletStatus.ACTIVE)
         .build();

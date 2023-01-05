@@ -28,9 +28,9 @@ public class TransactionServiceImpl implements TransactionService {
   private final WalletRepository walletRepository;
 
   @Override
-  public BigInteger doTransaction(Transaction transaction) {
+  public Transaction doTransaction(Transaction transaction) {
     final BigDecimal transactionAmount = transaction.getAmount();
-    final BigInteger transactionId = transactionRepository.save(transaction);
+    final Transaction newTransaction = transactionRepository.save(transaction);
 
     synchronized (walletRepository) {
       final Wallet originWallet = getGetWallet(transaction, transaction.getOriginClientId(), transaction.getOriginWalletId());
@@ -51,16 +51,14 @@ public class TransactionServiceImpl implements TransactionService {
 
       defineTransaction(transaction, TransactionStatus.SUCCESS, MessageErrors.TRANSACTION_SUCCESS);
     }
-    return transactionId;
+    return newTransaction;
   }
 
   private void updateWallet(Wallet targetWallet, TransactionType type, BigDecimal transactionAmount) {
-    final Wallet wallet = targetWallet.toBuilder()
-        .balance(calculateBalance(type, targetWallet.getBalance(), transactionAmount))
-        .build();
+    targetWallet.setBalance(calculateBalance(type, targetWallet.getBalance(), transactionAmount));
     log.debug("Transaction type: {} \t amount: {} \t oldbalance: {}\tbalance: {}",
-        type.name(), transactionAmount, targetWallet.getBalance(), wallet.getBalance());
-    walletRepository.save(wallet);
+        type.name(), transactionAmount, targetWallet.getBalance(), targetWallet.getBalance());
+    walletRepository.save(targetWallet);
   }
 
   private Wallet getGetWallet(final Transaction transaction, UUID clientId, UUID walletId) {
@@ -76,7 +74,7 @@ public class TransactionServiceImpl implements TransactionService {
         .cause(error.getMessage())
         .date(LocalDateTime.now())
         .build();
-    transactionRepository.update(updatedTransaction);
+    transactionRepository.save(updatedTransaction);
   }
 
   private BigDecimal calculateBalance(TransactionType type, BigDecimal balance, BigDecimal amount) {
@@ -102,7 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
-  public List<Transaction> findAllTransactionsByWallet(UUID clientId, UUID walletId) {
+  public Transaction findAllTransactionsByWallet(UUID clientId, UUID walletId) {
     return transactionRepository.findAllByClientIdAndWallet(clientId, walletId)
         .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
   }

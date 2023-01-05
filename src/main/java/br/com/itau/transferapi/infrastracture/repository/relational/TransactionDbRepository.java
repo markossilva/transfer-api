@@ -2,7 +2,8 @@ package br.com.itau.transferapi.infrastracture.repository.relational;
 
 import br.com.itau.transferapi.domain.model.Transaction;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,44 +14,48 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-class TransactionDbRepository implements TransactionRepository {
+public class TransactionDbRepository implements TransactionRepository {
 
+  private final TypeMap<TransactionEntity, Transaction> entityToDomain;
   private final TransactionJpaRepository transactionJpaRepository;
-  private final ObjectMapper mapper;
+  private final ModelMapper mapper;
 
   @Autowired
-  public TransactionDbRepository(TransactionJpaRepository transactionJpaRepository, ObjectMapper mapper) {
+  public TransactionDbRepository(TransactionJpaRepository transactionJpaRepository, ModelMapper mapper) {
     this.transactionJpaRepository = transactionJpaRepository;
     this.mapper = mapper;
+    this.entityToDomain = mapper.createTypeMap(TransactionEntity.class, Transaction.class)
+        .addMappings(to -> {
+          to.map(TransactionEntity::getId, Transaction::setId);
+          to.map(src -> src.getClient().getId(), Transaction::setOriginClientId);
+          to.map(src -> src.getWallet().getId(), Transaction::setOriginWalletId);
+          to.map(TransactionEntity::getTargetClientId, Transaction::setTargetClientId);
+          to.map(TransactionEntity::getTargetWalletId, Transaction::setTargetWalletId);
+          to.map(TransactionEntity::getAmount, Transaction::setAmount);
+          to.map(TransactionEntity::getStatus, Transaction::setStatus);
+          to.map(TransactionEntity::getCause, Transaction::setCause);
+          to.map(TransactionEntity::getDate, Transaction::setDate);
+        });
   }
 
   @Override
   public Optional<List<Transaction>> findAllByClientId(UUID clientID) {
     return Optional.of(transactionJpaRepository.findAllByClientId(clientID)
         .stream()
-        .map(transactionEntity -> mapper.convertValue(transactionEntity, Transaction.class))
+        .map(this.entityToDomain::map)
         .collect(Collectors.toList()));
   }
 
   @Override
-  public Optional<List<Transaction>> findAllByClientIdAndWallet(UUID clientID, UUID walletID) {
-    return Optional.of(transactionJpaRepository.findAllByClientIdAndWallet(clientID, walletID)
-        .stream()
-        .map(transactionEntity -> mapper.convertValue(transactionEntity, Transaction.class))
-        .collect(Collectors.toList()));
+  public Optional<Transaction> findAllByClientIdAndWallet(UUID clientID, UUID walletID) {
+    return Optional.of(this.entityToDomain.map(transactionJpaRepository
+        .findAllByClientIdAndWallet(clientID, walletID)));
   }
 
   @Override
-  public BigInteger save(Transaction transaction) {
-    return transactionJpaRepository
-        .save(mapper.convertValue(transaction, TransactionEntity.class))
-        .getId();
-  }
-
-  @Override
-  public Transaction update(Transaction transaction) {
+  public Transaction save(Transaction transaction) {
     transactionJpaRepository
-        .save(mapper.convertValue(transaction, TransactionEntity.class));
+        .save(mapper.map(transaction, TransactionEntity.class));
     return transaction;
   }
 }

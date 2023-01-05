@@ -1,6 +1,7 @@
 package br.com.itau.transferapi.infrastracture.repository.relational;
 
 import br.com.itau.transferapi.domain.model.TransactionStatus;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +13,10 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = TransactionEntity.TABLE)
+public
 class TransactionEntity {
   static final String TABLE = "tbl_transaction",
       TARGET_WALLET_ID = "target_wallet_id",
@@ -24,12 +27,17 @@ class TransactionEntity {
   @Id
   private BigInteger id;
 
-  @ManyToOne
-  @JoinColumn(name = JOIN_CLIENT_ID, nullable = false)
+  @Column(name = JOIN_CLIENT_ID)
+  private UUID originClientId;
+
+  @Column(name = JOIN_WALLET_ID)
+  private UUID originWalletId;
+  @ManyToOne(targetEntity = ClientEntity.class, fetch = FetchType.EAGER)
+  @JoinColumn(name = JOIN_CLIENT_ID, nullable = false, insertable = false, updatable = false)
   private ClientEntity client;
 
-  @ManyToOne
-  @JoinColumn(name = JOIN_WALLET_ID, nullable = false)
+  @ManyToOne(targetEntity = WalletEntity.class, fetch = FetchType.EAGER)
+  @JoinColumn(name = JOIN_WALLET_ID, nullable = false, insertable = false, updatable = false)
   private WalletEntity wallet;
 
   @Column(name = TARGET_CLIENT_ID, nullable = false)
@@ -48,4 +56,39 @@ class TransactionEntity {
   private String cause;
 
   private LocalDateTime date;
+
+  public TransactionEntity() {}
+
+  public TransactionEntity(BigInteger id, UUID originClientId, UUID originWalletId,
+                           ClientEntity client, WalletEntity wallet, UUID targetClientId,
+                           UUID targetWalletId, BigDecimal amount, TransactionStatus status,
+                           String cause, LocalDateTime date) {
+    this.id = id;
+    this.originClientId = originClientId;
+    this.originWalletId = originWalletId;
+    this.client = client;
+    this.wallet = wallet;
+    this.targetClientId = targetClientId;
+    this.targetWalletId = targetWalletId;
+    this.amount = amount;
+    this.status = status;
+    this.cause = cause;
+    this.date = date;
+  }
+
+  public TransactionEntity(BigInteger id, ClientEntity client,
+                           WalletEntity wallet, UUID targetClientId,
+                           UUID targetWalletId, BigDecimal amount,
+                           TransactionStatus status, String cause,
+                           LocalDateTime date) {
+    this.id = id;
+    this.client = client;
+    this.wallet = wallet;
+    this.targetClientId = targetClientId;
+    this.targetWalletId = targetWalletId;
+    this.amount = amount;
+    this.status = status;
+    this.cause = cause;
+    this.date = date;
+  }
 }

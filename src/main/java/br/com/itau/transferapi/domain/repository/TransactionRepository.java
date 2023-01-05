@@ -10,9 +10,7 @@ import java.util.UUID;
 public interface TransactionRepository {
   Optional<List<Transaction>> findAllByClientId(UUID clientID);
 
-  Optional<List<Transaction>> findAllByClientIdAndWallet(UUID clientID, UUID walletID);
+  Optional<Transaction> findAllByClientIdAndWallet(UUID clientID, UUID walletID);
 
-  BigInteger save(Transaction transaction);
-
-  Transaction update(Transaction transaction);
+  Transaction save(Transaction transaction);
 }
