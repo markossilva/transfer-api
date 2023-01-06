@@ -18,7 +18,7 @@ public interface WalletJpaRepository extends JpaRepository<WalletEntity, UUID> {
       @Param("walletId") UUID walletId,
       @Param("clientId") UUID clientId);
 
-  @Query("select w from WalletEntity w where w.client.id = ?1 and w.id = ?2")
+  @Query("select w from WalletEntity w where w.walletClientId = ?1 and w.id = ?2")
   WalletEntity findByClientAndWallet(UUID clientId, UUID walletId);
 
   @Query("select w from WalletEntity w where w.client.id = ?1")

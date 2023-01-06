@@ -35,7 +35,9 @@ public class BeanConfiguration {
 
   @Bean
   ModelMapper mapper() {
-    return new ModelMapper();
+    final ModelMapper modelMapper = new ModelMapper();
+    modelMapper.getConfiguration().setAmbiguityIgnored(Boolean.TRUE);
+    return modelMapper;
   }
 
   @Bean

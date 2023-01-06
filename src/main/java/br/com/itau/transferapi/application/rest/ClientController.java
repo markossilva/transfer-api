@@ -38,8 +38,13 @@ public class ClientController {
     return ResponseEntity.ok(service.findAllClients());
   }
 
-  @GetMapping("/wallets")
+  @GetMapping("/user/wallets")
   ResponseEntity<List<Wallet>> findAllWalletsByClient(@RequestParam final String clientId) {
     return ResponseEntity.ok(service.findAllWallets(UUID.fromString(clientId)));
+  }
+
+  @GetMapping("/wallet")
+  ResponseEntity<Wallet> findWalletsById(@RequestParam final String clientId, @RequestParam final String walletId) {
+    return ResponseEntity.ok(service.findAWallet(UUID.fromString(clientId), UUID.fromString(walletId)));
   }
 }

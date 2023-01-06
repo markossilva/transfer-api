@@ -36,7 +36,9 @@ public class TransactionRepositoryTest {
   @BeforeEach
   void setUp() {
     transactionJpaRepository = mock(TransactionJpaRepository.class);
-    transactionRepository = new TransactionDbRepository(transactionJpaRepository, new ModelMapper());
+    final ModelMapper mapper = new ModelMapper();
+    mapper.getConfiguration().setAmbiguityIgnored(Boolean.TRUE);
+    transactionRepository = new TransactionDbRepository(transactionJpaRepository, mapper);
 
     clientId = UUID.randomUUID();
     walletId = UUID.randomUUID();

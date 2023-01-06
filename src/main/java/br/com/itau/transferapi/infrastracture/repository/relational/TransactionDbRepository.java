@@ -25,8 +25,8 @@ public class TransactionDbRepository implements TransactionRepository {
     mapper.createTypeMap(TransactionEntity.class, Transaction.class)
         .addMappings(to -> {
           to.map(TransactionEntity::getId, Transaction::setId);
-          to.map(src -> src.getClient().getId(), Transaction::setOriginClientId);
-          to.map(src -> src.getWallet().getId(), Transaction::setOriginWalletId);
+          to.map(TransactionEntity::getOriginClientId, Transaction::setOriginClientId);
+          to.map(TransactionEntity::getOriginWalletId, Transaction::setOriginWalletId);
           to.map(TransactionEntity::getTargetClientId, Transaction::setTargetClientId);
           to.map(TransactionEntity::getTargetWalletId, Transaction::setTargetWalletId);
           to.map(TransactionEntity::getAmount, Transaction::setAmount);
