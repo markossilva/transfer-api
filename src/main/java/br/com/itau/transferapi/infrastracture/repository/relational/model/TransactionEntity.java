@@ -25,12 +25,13 @@ class TransactionEntity {
       JOIN_WALLET_ID = "wallet_id";
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private BigInteger id;
 
-  @Column(name = JOIN_CLIENT_ID)
+  @Column(name = JOIN_CLIENT_ID, columnDefinition = "uuid")
   private UUID originClientId;
 
-  @Column(name = JOIN_WALLET_ID)
+  @Column(name = JOIN_WALLET_ID, columnDefinition = "uuid")
   private UUID originWalletId;
   @ManyToOne(targetEntity = ClientEntity.class, fetch = FetchType.EAGER)
   @JoinColumn(name = JOIN_CLIENT_ID, nullable = false, insertable = false, updatable = false)
@@ -40,10 +41,10 @@ class TransactionEntity {
   @JoinColumn(name = JOIN_WALLET_ID, nullable = false, insertable = false, updatable = false)
   private WalletEntity wallet;
 
-  @Column(name = TARGET_CLIENT_ID, nullable = false)
+  @Column(name = TARGET_CLIENT_ID, nullable = false, columnDefinition = "uuid")
   private UUID targetClientId;
 
-  @Column(name = TARGET_WALLET_ID, nullable = false)
+  @Column(name = TARGET_WALLET_ID, nullable = false, columnDefinition = "uuid")
   private UUID targetWalletId;
 
   @Column(nullable = false)

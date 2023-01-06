@@ -3,7 +3,6 @@ package br.com.itau.transferapi.infrastracture.repository.relational.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.List;
@@ -19,6 +18,7 @@ public class ClientEntity {
       CLIENT_JOIN = "client";
 
   @Id
+  @Column(columnDefinition = "uuid")
   private UUID id;
 
   private String name;

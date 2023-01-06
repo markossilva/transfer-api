@@ -20,6 +20,7 @@ class WalletEntity {
       CLIENT_JOIN = "client_id";
 
   @Id
+  @Column(columnDefinition = "uuid")
   private UUID id;
 
   private BigDecimal balance;
@@ -28,7 +29,7 @@ class WalletEntity {
   @Column(nullable = false)
   private WalletStatus status;
 
-  @Column(name = CLIENT_JOIN)
+  @Column(name = CLIENT_JOIN, columnDefinition = "uuid")
   private UUID walletClientId;
 
   @ManyToOne(targetEntity = ClientEntity.class, fetch = FetchType.EAGER)
