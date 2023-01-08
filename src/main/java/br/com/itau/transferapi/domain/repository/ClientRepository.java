@@ -13,4 +13,6 @@ public interface ClientRepository {
   void save(Client client);
 
   List<Client> findAll();
+
+  Optional<Client> findClientByWalletId(UUID walletId);
 }

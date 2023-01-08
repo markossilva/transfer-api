@@ -13,8 +13,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-public
-class ClientDbRepository implements ClientRepository {
+public class ClientDbRepository implements ClientRepository {
 
   private final ClientJpaRepository clientJpaRepository;
   private final ModelMapper mapper;
@@ -42,5 +41,11 @@ class ClientDbRepository implements ClientRepository {
         .stream()
         .map(clientEntity -> mapper.map(clientEntity, Client.class))
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public Optional<Client> findClientByWalletId(UUID walletId) {
+    return Optional.of(mapper.map(clientJpaRepository
+        .findClientByWalletId(walletId), Client.class));
   }
 }

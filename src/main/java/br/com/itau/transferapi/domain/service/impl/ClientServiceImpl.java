@@ -20,7 +20,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
-  private static final BigDecimal INITIAL_WALLET_BALANCE = BigDecimal.ZERO;
+  private static final BigDecimal INITIAL_WALLET_BALANCE = BigDecimal.valueOf(100L);
 
   private final ClientRepository clientRepository;
   private final WalletRepository walletRepository;
@@ -76,6 +76,12 @@ public class ClientServiceImpl implements ClientService {
   @Override
   public Wallet findAWallet(UUID clientId, UUID walletId) {
     return walletRepository.findById(clientId, walletId)
+        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS));
+  }
+
+  @Override
+  public Client findClientByWalletId(UUID walletId) {
+    return clientRepository.findClientByWalletId(walletId)
         .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS));
   }
 }
