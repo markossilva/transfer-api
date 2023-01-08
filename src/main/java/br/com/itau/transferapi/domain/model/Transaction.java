@@ -16,10 +16,11 @@ public class Transaction {
   BigInteger id;
   UUID originClientId;
   UUID originWalletId;
-  UUID targetClientId;
-  UUID targetWalletId;
+  UUID clientId;
+  UUID walletId;
   BigDecimal amount;
   TransactionStatus status;
+  TransactionType type;
   String cause;
   LocalDateTime date;
 
@@ -27,17 +28,18 @@ public class Transaction {
   }
 
   public Transaction(BigInteger id, UUID originClientId,
-                     UUID originWalletId, UUID targetClientId,
-                     UUID targetWalletId, BigDecimal amount,
-                     TransactionStatus status, String cause,
-                     LocalDateTime date) {
+                     UUID originWalletId, UUID clientId,
+                     UUID walletId, BigDecimal amount,
+                     TransactionStatus status, TransactionType type,
+                     String cause, LocalDateTime date) {
     this.id = id;
     this.originClientId = originClientId;
     this.originWalletId = originWalletId;
-    this.targetClientId = targetClientId;
-    this.targetWalletId = targetWalletId;
+    this.clientId = clientId;
+    this.walletId = walletId;
     this.amount = amount;
     this.status = status;
+    this.type = type;
     this.cause = cause;
     this.date = date;
   }

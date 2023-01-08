@@ -69,13 +69,18 @@ public class TransactionServiceImplTest {
 
     final List<List<Transaction>> partitions = ListUtils.partition(transactionList, transactionList.size() / THREAD_COUNT);
 
+    transactionList.forEach(transaction ->
+        when(transactionRepository.save(transaction))
+            .thenReturn(transaction)
+    );
+
     final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT);
+
 
     long startTime = System.nanoTime();
     partitions.forEach(partition ->
         executorService.execute(() ->
             doTransaction(partition)
-
         )
     );
 
@@ -99,9 +104,9 @@ public class TransactionServiceImplTest {
   }
 
   private void doTransaction(List<Transaction> partition) {
-    partition.forEach(transaction -> {
-      transactionService.doTransaction(transaction);
-    });
+    partition.forEach(transaction ->
+        transactionService.doTransaction(transaction)
+    );
   }
 
   @Test
@@ -111,8 +116,8 @@ public class TransactionServiceImplTest {
             .id(BigInteger.ONE)
             .originClientId(originClientId)
             .originWalletId(originWalletId)
-            .targetClientId(targetClientId)
-            .targetWalletId(targetWalletId)
+            .clientId(targetClientId)
+            .walletId(targetWalletId)
             .amount(BigDecimal.valueOf(1001L))
             .status(TransactionStatus.PROCESSING)
             .date(LocalDateTime.now())
@@ -130,8 +135,8 @@ public class TransactionServiceImplTest {
             .id(BigInteger.ONE)
             .originClientId(originClientId)
             .originWalletId(originWalletId)
-            .targetClientId(targetClientId)
-            .targetWalletId(targetWalletId)
+            .clientId(targetClientId)
+            .walletId(targetWalletId)
             .amount(BigDecimal.valueOf(100L))
             .status(TransactionStatus.PROCESSING)
             .date(LocalDateTime.now())
@@ -151,8 +156,8 @@ public class TransactionServiceImplTest {
             .id(BigInteger.ONE)
             .originClientId(originClientId)
             .originWalletId(originWalletId)
-            .targetClientId(targetClientId)
-            .targetWalletId(targetWalletId)
+            .clientId(targetClientId)
+            .walletId(targetWalletId)
             .amount(BigDecimal.ONE)
             .status(TransactionStatus.PROCESSING)
             .date(LocalDateTime.now())
@@ -172,7 +177,8 @@ public class TransactionServiceImplTest {
   }
 
   private Method getCalculateBalanceMethod() throws NoSuchMethodException {
-    Method method = transactionService.getClass().getDeclaredMethod("calculateBalance", TransactionType.class, BigDecimal.class, BigDecimal.class);
+    Method method = transactionService.getClass()
+        .getDeclaredMethod("calculateBalance", TransactionType.class, BigDecimal.class, BigDecimal.class);
     method.setAccessible(true);
     return method;
   }

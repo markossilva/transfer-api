@@ -41,14 +41,18 @@ public class ClientController {
   }
 
   @PutMapping
-  ResponseEntity<Boolean> doTransaction() {
+  ResponseEntity<Boolean> doTransaction(@RequestParam final String originClientId,
+                                        @RequestParam final String originWalletId,
+                                        @RequestParam final String targetClientId,
+                                        @RequestParam final String targetWalletId,
+                                        @RequestParam final BigDecimal amount) {
     transactionService.doTransaction(Transaction.builder()
-        .targetClientId(UUID.fromString("09966449-2460-487a-800a-19cc3a2b88a9"))
-        .targetWalletId(UUID.fromString("137c24cb-827f-44c2-8410-0cd474da78b3"))
-        .originClientId(UUID.fromString("80383279-68c2-402c-a9fa-1caaf843a536"))
-        .originWalletId(UUID.fromString("edb563af-024a-45b8-bfa9-8d7ca46d8c4d"))
+        .clientId(UUID.fromString(targetClientId))
+        .walletId(UUID.fromString(targetWalletId))
+        .originClientId(UUID.fromString(originClientId))
+        .originWalletId(UUID.fromString(originWalletId))
         .status(TransactionStatus.PROCESSING)
-        .amount(BigDecimal.ONE)
+        .amount(amount)
         .build());
     return ResponseEntity.ok(Boolean.TRUE);
   }

@@ -11,6 +11,7 @@ import br.com.itau.transferapi.infrastracture.repository.relational.model.Transa
 import br.com.itau.transferapi.infrastracture.repository.relational.model.WalletEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
@@ -32,11 +33,12 @@ public class TransactionRepositoryTest {
   private UUID walletId;
   private TransactionEntity transactionEntity;
   private Transaction transaction;
+  private ModelMapper mapper;
 
   @BeforeEach
   void setUp() {
     transactionJpaRepository = mock(TransactionJpaRepository.class);
-    final ModelMapper mapper = new ModelMapper();
+    mapper = spy(new ModelMapper());
     mapper.getConfiguration().setAmbiguityIgnored(Boolean.TRUE);
     transactionRepository = new TransactionDbRepository(transactionJpaRepository, mapper);
 
@@ -60,8 +62,8 @@ public class TransactionRepositoryTest {
             .build())
         .originClientId(clientId)
         .originWalletId(walletId)
-        .targetClientId(targetClientId)
-        .targetWalletId(targetWalletId)
+        .clientId(targetClientId)
+        .walletId(targetWalletId)
         .amount(BigDecimal.TEN)
         .status(TransactionStatus.SUCCESS)
         .date(LocalDateTime.now())
@@ -71,8 +73,8 @@ public class TransactionRepositoryTest {
         .id(BigInteger.ONE)
         .originClientId(clientId)
         .originWalletId(walletId)
-        .targetClientId(targetClientId)
-        .targetWalletId(targetWalletId)
+        .clientId(targetClientId)
+        .walletId(targetWalletId)
         .amount(BigDecimal.TEN)
         .status(TransactionStatus.SUCCESS)
         .date(LocalDateTime.now())
@@ -108,6 +110,7 @@ public class TransactionRepositoryTest {
   void whenSave_thenReturnId() {
     when(transactionJpaRepository.save(transactionEntity))
         .thenReturn(transactionEntity);
+    when(mapper.map(transaction, TransactionEntity.class)).thenReturn(transactionEntity);
 
     final Transaction save = transactionRepository.save(transaction);
 

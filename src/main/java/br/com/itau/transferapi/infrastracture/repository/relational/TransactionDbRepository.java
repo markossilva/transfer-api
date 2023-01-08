@@ -27,8 +27,8 @@ public class TransactionDbRepository implements TransactionRepository {
           to.map(TransactionEntity::getId, Transaction::setId);
           to.map(TransactionEntity::getOriginClientId, Transaction::setOriginClientId);
           to.map(TransactionEntity::getOriginWalletId, Transaction::setOriginWalletId);
-          to.map(TransactionEntity::getTargetClientId, Transaction::setTargetClientId);
-          to.map(TransactionEntity::getTargetWalletId, Transaction::setTargetWalletId);
+          to.map(TransactionEntity::getClientId, Transaction::setClientId);
+          to.map(TransactionEntity::getWalletId, Transaction::setWalletId);
           to.map(TransactionEntity::getAmount, Transaction::setAmount);
           to.map(TransactionEntity::getStatus, Transaction::setStatus);
           to.map(TransactionEntity::getCause, Transaction::setCause);
@@ -52,8 +52,8 @@ public class TransactionDbRepository implements TransactionRepository {
 
   @Override
   public Transaction save(Transaction transaction) {
-    transactionJpaRepository
+    final TransactionEntity savedTransaction = transactionJpaRepository
         .save(mapper.map(transaction, TransactionEntity.class));
-    return transaction;
+    return mapper.map(savedTransaction, Transaction.class);
   }
 }

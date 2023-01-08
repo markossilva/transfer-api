@@ -53,8 +53,8 @@ public class TransactionEventListener implements ApplicationListener<Transaction
         updateWallet(wallet, TransactionType.SEND, amount);
         break;
       case RECEIVE:
-        final Wallet targetWallet = getWallet(transaction, transaction.getTargetClientId(),
-            transaction.getTargetWalletId());
+        final Wallet targetWallet = getWallet(transaction, transaction.getClientId(),
+            transaction.getWalletId());
 
         updateWallet(targetWallet, TransactionType.RECEIVE, amount);
         break;
