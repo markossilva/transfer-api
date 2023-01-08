@@ -49,8 +49,8 @@ public class ClientController {
     transactionService.doTransaction(Transaction.builder()
         .clientId(UUID.fromString(targetClientId))
         .walletId(UUID.fromString(targetWalletId))
-        .originClientId(UUID.fromString(originClientId))
-        .originWalletId(UUID.fromString(originWalletId))
+        .targetClientId(UUID.fromString(originClientId))
+        .targetWalletId(UUID.fromString(originWalletId))
         .status(TransactionStatus.PROCESSING)
         .amount(amount)
         .build());

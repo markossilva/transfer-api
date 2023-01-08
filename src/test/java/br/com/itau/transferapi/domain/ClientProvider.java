@@ -31,7 +31,7 @@ public class ClientProvider {
     return Arrays.asList(
         Transaction.builder()
             .id(BigInteger.ONE)
-            .originClientId(originClientId)
+            .targetClientId(originClientId)
             .clientId(targetClientId)
             .walletId(UUID.randomUUID())
             .amount(BigDecimal.TEN)
@@ -40,7 +40,7 @@ public class ClientProvider {
             .build(),
         Transaction.builder()
             .id(BigInteger.TWO)
-            .originClientId(targetClientId)
+            .targetClientId(targetClientId)
             .clientId(originClientId)
             .walletId(UUID.randomUUID())
             .amount(BigDecimal.TEN)
@@ -53,8 +53,8 @@ public class ClientProvider {
   public static Transaction getCreatedTransaction(final UUID originClientId, final UUID targetClientId) {
     return Transaction.builder()
         .id(BigInteger.ONE)
-        .originClientId(originClientId)
-        .originWalletId(UUID.randomUUID())
+        .targetClientId(originClientId)
+        .targetWalletId(UUID.randomUUID())
         .clientId(targetClientId)
         .walletId(UUID.randomUUID())
         .amount(BigDecimal.TEN)

@@ -34,7 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
       final Wallet targetWallet = findAndVerifyWallet(initialTransaction,
           initialTransaction.getClientId(), initialTransaction.getWalletId());
       final Wallet originWallet = findAndVerifyWallet(initialTransaction,
-          initialTransaction.getOriginClientId(), initialTransaction.getOriginWalletId());
+          initialTransaction.getTargetClientId(), initialTransaction.getTargetWalletId());
       final BigDecimal transactionAmount = initialTransaction.getAmount();
 
       if (transactionAmount.compareTo(BigDecimal.valueOf(CLIENT_TRANSACTION_LIMIT)) >= ZERO_VALUE_COMPARATOR) {
@@ -56,10 +56,10 @@ public class TransactionServiceImpl implements TransactionService {
 
   private Transaction buildSendTransaction(Transaction initTransaction, Wallet targetWallet) {
     return Transaction.builder()
-        .originClientId(targetWallet.getClientId())
-        .originWalletId(targetWallet.getId())
-        .walletId(initTransaction.getOriginWalletId())
-        .clientId(initTransaction.getOriginClientId())
+        .targetClientId(targetWallet.getClientId())
+        .targetWalletId(targetWallet.getId())
+        .walletId(initTransaction.getTargetWalletId())
+        .clientId(initTransaction.getTargetClientId())
         .amount(initTransaction.getAmount())
         .date(LocalDateTime.now())
         .build();

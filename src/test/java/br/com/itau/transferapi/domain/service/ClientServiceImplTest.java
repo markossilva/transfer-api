@@ -187,7 +187,7 @@ public class ClientServiceImplTest {
         .findAllTransactionsByWallet(randomClientID, randomWalletID);
 
     verify(transactionRepository).findAllByClientIdAndWallet(randomClientID, randomWalletID);
-    assertEquals(allTransactions.getOriginWalletId(), providedTransactions.getOriginWalletId());
+    assertEquals(allTransactions.getTargetWalletId(), providedTransactions.getTargetWalletId());
   }
 
   @Test

@@ -42,8 +42,8 @@ public class TransactionEventListener implements ApplicationListener<Transaction
 
     switch (event.getType()) {
       case SEND:
-        final Wallet wallet = getWallet(transaction, transaction.getOriginClientId(),
-            transaction.getOriginWalletId());
+        final Wallet wallet = getWallet(transaction, transaction.getTargetClientId(),
+            transaction.getTargetWalletId());
 
         if (wallet.getBalance().compareTo(amount) <= AMOUNT_IN_WALLET) {
           defineTransaction(transaction, TransactionStatus.FAIL, MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);

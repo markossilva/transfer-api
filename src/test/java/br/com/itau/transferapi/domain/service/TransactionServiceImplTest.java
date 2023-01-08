@@ -114,8 +114,8 @@ public class TransactionServiceImplTest {
     final Executable executable = () -> transactionService.doTransaction(
         Transaction.builder()
             .id(BigInteger.ONE)
-            .originClientId(originClientId)
-            .originWalletId(originWalletId)
+            .targetClientId(originClientId)
+            .targetWalletId(originWalletId)
             .clientId(targetClientId)
             .walletId(targetWalletId)
             .amount(BigDecimal.valueOf(1001L))
@@ -133,8 +133,8 @@ public class TransactionServiceImplTest {
     final Executable executable = () -> transactionService.doTransaction(
         Transaction.builder()
             .id(BigInteger.ONE)
-            .originClientId(originClientId)
-            .originWalletId(originWalletId)
+            .targetClientId(originClientId)
+            .targetWalletId(originWalletId)
             .clientId(targetClientId)
             .walletId(targetWalletId)
             .amount(BigDecimal.valueOf(100L))
@@ -154,8 +154,8 @@ public class TransactionServiceImplTest {
     final Executable executable = () -> transactionService.doTransaction(
         Transaction.builder()
             .id(BigInteger.ONE)
-            .originClientId(originClientId)
-            .originWalletId(originWalletId)
+            .targetClientId(originClientId)
+            .targetWalletId(originWalletId)
             .clientId(targetClientId)
             .walletId(targetWalletId)
             .amount(BigDecimal.ONE)

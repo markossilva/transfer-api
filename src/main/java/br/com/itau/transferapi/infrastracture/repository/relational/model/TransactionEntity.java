@@ -20,8 +20,8 @@ import java.util.UUID;
 public
 class TransactionEntity {
   static final String TABLE = "tbl_transaction",
-        TARGET_WALLET_ID = "origin_wallet_id",
-  TARGET_CLIENT_ID = "origin_client_id",
+      TARGET_WALLET_ID = "target_wallet_id",
+      TARGET_CLIENT_ID = "target_client_id",
       JOIN_CLIENT_ID = "client_id",
       JOIN_WALLET_ID = "wallet_id";
 
@@ -43,10 +43,10 @@ class TransactionEntity {
   private WalletEntity wallet;
 
   @Column(name = TARGET_CLIENT_ID, nullable = false, columnDefinition = "uuid")
-  private UUID originClientId;
+  private UUID targetClientId;
 
   @Column(name = TARGET_WALLET_ID, nullable = false, columnDefinition = "uuid")
-  private UUID originWalletId;
+  private UUID targetWalletId;
 
   @Column(nullable = false)
   private BigDecimal amount;
@@ -68,8 +68,8 @@ class TransactionEntity {
 
   public TransactionEntity(BigInteger id, UUID clientId,
                            UUID walletId, ClientEntity client,
-                           WalletEntity wallet, UUID originClientId,
-                           UUID originWalletId, BigDecimal amount,
+                           WalletEntity wallet, UUID targetClientId,
+                           UUID targetWalletId, BigDecimal amount,
                            TransactionStatus status, TransactionType type,
                            String cause, LocalDateTime date) {
     this.id = id;
@@ -77,8 +77,8 @@ class TransactionEntity {
     this.walletId = walletId;
     this.client = client;
     this.wallet = wallet;
-    this.originClientId = originClientId;
-    this.originWalletId = originWalletId;
+    this.targetClientId = targetClientId;
+    this.targetWalletId = targetWalletId;
     this.amount = amount;
     this.status = status;
     this.type = type;

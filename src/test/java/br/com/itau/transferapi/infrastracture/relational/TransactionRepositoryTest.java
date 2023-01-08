@@ -60,8 +60,8 @@ public class TransactionRepositoryTest {
             .balance(BigDecimal.TEN)
             .status(WalletStatus.ACTIVE)
             .build())
-        .originClientId(clientId)
-        .originWalletId(walletId)
+        .targetClientId(clientId)
+        .targetWalletId(walletId)
         .clientId(targetClientId)
         .walletId(targetWalletId)
         .amount(BigDecimal.TEN)
@@ -71,8 +71,8 @@ public class TransactionRepositoryTest {
 
     transaction = Transaction.builder()
         .id(BigInteger.ONE)
-        .originClientId(clientId)
-        .originWalletId(walletId)
+        .targetClientId(clientId)
+        .targetWalletId(walletId)
         .clientId(targetClientId)
         .walletId(targetWalletId)
         .amount(BigDecimal.TEN)
@@ -103,14 +103,15 @@ public class TransactionRepositoryTest {
         .findAllByClientIdAndWallet(clientId, walletId);
 
     assertTrue(allByClientIdAndWallet.isPresent());
-    assertEquals(allByClientIdAndWallet.get().getOriginWalletId(), transactionEntity.getWallet().getId());
+    assertEquals(allByClientIdAndWallet.get().getTargetWalletId(), transactionEntity.getWallet().getId());
   }
 
   @Test
   void whenSave_thenReturnId() {
     when(transactionJpaRepository.save(transactionEntity))
         .thenReturn(transactionEntity);
-    when(mapper.map(transaction, TransactionEntity.class)).thenReturn(transactionEntity);
+    when(mapper.map(transaction, TransactionEntity.class))
+        .thenReturn(transactionEntity);
 
     final Transaction save = transactionRepository.save(transaction);
 
