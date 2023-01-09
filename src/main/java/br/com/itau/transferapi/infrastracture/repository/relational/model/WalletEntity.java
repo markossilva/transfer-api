@@ -14,8 +14,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = WalletEntity.TABLE)
-public
-class WalletEntity {
+public class WalletEntity {
   static final String TABLE = "tbl_wallet",
       CLIENT_JOIN = "client_id";
 

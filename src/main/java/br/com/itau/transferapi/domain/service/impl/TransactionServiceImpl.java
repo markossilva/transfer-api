@@ -88,7 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
 
   private Wallet findAndVerifyWallet(UUID clientId, UUID walletId) {
     return walletRepository.findById(clientId, walletId).orElseThrow(() ->
-       new TransactionDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS)
+        new TransactionDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS)
     );
   }
 

@@ -14,7 +14,12 @@ spring:
       settings.trace: false
       settings.web-allow-others: false
   jpa:
-    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
-    hibernate.ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
     show-sql: true
     generate-ddl: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          import_files: data.sql
