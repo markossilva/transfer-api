@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,20 +42,22 @@ public class ClientController {
   }
 
   @PutMapping
-  ResponseEntity<Boolean> doTransaction(@RequestParam final String originClientId,
-                                        @RequestParam final String originWalletId,
-                                        @RequestParam final String targetClientId,
-                                        @RequestParam final String targetWalletId,
-                                        @RequestParam final BigDecimal amount) {
-    transactionService.doTransaction(Transaction.builder()
+  ResponseEntity<BigInteger> doTransaction(@RequestParam final String originClientId,
+                                           @RequestParam final String originWalletId,
+                                           @RequestParam final String targetClientId,
+                                           @RequestParam final String targetWalletId,
+                                           @RequestParam final BigDecimal amount) {
+    final Transaction buildTransaction = Transaction.builder()
         .clientId(UUID.fromString(targetClientId))
         .walletId(UUID.fromString(targetWalletId))
         .targetClientId(UUID.fromString(originClientId))
         .targetWalletId(UUID.fromString(originWalletId))
         .status(TransactionStatus.PROCESSING)
+        .type(TransactionType.SEND)
         .amount(amount)
-        .build());
-    return ResponseEntity.ok(Boolean.TRUE);
+        .build();
+    transactionService.doTransaction(buildTransaction);
+    return ResponseEntity.ok(buildTransaction.getId());
   }
 
   @GetMapping("/wallets")

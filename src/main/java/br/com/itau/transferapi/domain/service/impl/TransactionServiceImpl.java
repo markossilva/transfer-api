@@ -28,22 +28,21 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public Transaction doTransaction(Transaction transaction) {
+    final Wallet targetWallet = findAndVerifyWallet(transaction.getClientId(), transaction.getWalletId());
+    final Wallet originWallet = findAndVerifyWallet(transaction.getTargetClientId(), transaction.getTargetWalletId());
+
     final Transaction initialTransaction = transactionRepository.save(transaction);
+    final BigDecimal transactionAmount = initialTransaction.getAmount();
 
     synchronized (walletRepository) {
-      final Wallet targetWallet = findAndVerifyWallet(initialTransaction,
-          initialTransaction.getClientId(), initialTransaction.getWalletId());
-      final Wallet originWallet = findAndVerifyWallet(initialTransaction,
-          initialTransaction.getTargetClientId(), initialTransaction.getTargetWalletId());
-      final BigDecimal transactionAmount = initialTransaction.getAmount();
 
       if (transactionAmount.compareTo(BigDecimal.valueOf(CLIENT_TRANSACTION_LIMIT)) >= ZERO_VALUE_COMPARATOR) {
-        defineTransactionStatus(initialTransaction, TransactionStatus.FAIL, MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION);
+        defineTransactionStatus(buildFailTransaction(initialTransaction, targetWallet), TransactionStatus.FAIL, MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION);
         throw new TransactionDomainException(MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION);
       }
 
       if (originWallet.getBalance().compareTo(transactionAmount) <= ZERO_VALUE_COMPARATOR) {
-        defineTransactionStatus(initialTransaction, TransactionStatus.FAIL, MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);
+        defineTransactionStatus(buildFailTransaction(initialTransaction, targetWallet), TransactionStatus.FAIL, MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);
         throw new TransactionDomainException(MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);
       }
 
@@ -65,6 +64,19 @@ public class TransactionServiceImpl implements TransactionService {
         .build();
   }
 
+  private Transaction buildFailTransaction(Transaction initTransaction, Wallet targetWallet) {
+    return Transaction.builder()
+        .id(initTransaction.getId())
+        .targetClientId(targetWallet.getClientId())
+        .targetWalletId(targetWallet.getId())
+        .walletId(initTransaction.getTargetWalletId())
+        .clientId(initTransaction.getTargetClientId())
+        .amount(initTransaction.getAmount())
+        .type(initTransaction.getType())
+        .date(LocalDateTime.now())
+        .build();
+  }
+
   private void updateWallet(Wallet wallet, TransactionType type, Transaction transaction) {
 
     wallet.setBalance(calculateBalance(type, wallet.getBalance(), transaction.getAmount()));
@@ -74,11 +86,10 @@ public class TransactionServiceImpl implements TransactionService {
     defineTransactionStatus(transaction, TransactionStatus.SUCCESS, MessageErrors.TRANSACTION_SUCCESS);
   }
 
-  private Wallet findAndVerifyWallet(final Transaction transaction, UUID clientId, UUID walletId) {
-    return walletRepository.findById(clientId, walletId).orElseThrow(() -> {
-      defineTransactionStatus(transaction, TransactionStatus.FAIL, MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
-      return new TransactionDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
-    });
+  private Wallet findAndVerifyWallet(UUID clientId, UUID walletId) {
+    return walletRepository.findById(clientId, walletId).orElseThrow(() ->
+       new TransactionDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS)
+    );
   }
 
   private void defineTransactionStatus(final Transaction transaction, TransactionStatus status, MessageErrors error) {

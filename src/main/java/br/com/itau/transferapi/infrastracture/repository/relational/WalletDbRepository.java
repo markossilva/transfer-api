@@ -35,8 +35,12 @@ public class WalletDbRepository implements WalletRepository {
 
   @Override
   public Optional<Wallet> findById(UUID clientId, UUID walletId) {
-    return Optional.of(mapper.map(walletJpaRepository
-        .findByClientAndWallet(clientId, walletId), Wallet.class));
+    final WalletEntity byClientAndWallet = walletJpaRepository
+        .findByClientAndWallet(clientId, walletId);
+    if (byClientAndWallet != null) {
+      return Optional.of(mapper.map(byClientAndWallet, Wallet.class));
+    }
+    return Optional.empty();
   }
 
   @Override

@@ -111,17 +111,21 @@ public class TransactionServiceImplTest {
 
   @Test
   void shouldDoTransaction_moreThanLimitOfTransaction_thenThrowException() {
+    final Transaction transaction = Transaction.builder()
+        .id(BigInteger.ONE)
+        .targetClientId(originClientId)
+        .targetWalletId(originWalletId)
+        .clientId(targetClientId)
+        .walletId(targetWalletId)
+        .amount(BigDecimal.valueOf(1001L))
+        .status(TransactionStatus.PROCESSING)
+        .date(LocalDateTime.now())
+        .build();
+    when(transactionRepository.save(transaction))
+        .thenReturn(transaction);
+
     final Executable executable = () -> transactionService.doTransaction(
-        Transaction.builder()
-            .id(BigInteger.ONE)
-            .targetClientId(originClientId)
-            .targetWalletId(originWalletId)
-            .clientId(targetClientId)
-            .walletId(targetWalletId)
-            .amount(BigDecimal.valueOf(1001L))
-            .status(TransactionStatus.PROCESSING)
-            .date(LocalDateTime.now())
-            .build());
+        transaction);
 
     verify(transactionRepository, times(0))
         .save(any(Transaction.class));
@@ -130,17 +134,20 @@ public class TransactionServiceImplTest {
 
   @Test
   void shouldDoTransaction_moreThanWalletAmount_thenThrowException() {
-    final Executable executable = () -> transactionService.doTransaction(
-        Transaction.builder()
-            .id(BigInteger.ONE)
-            .targetClientId(originClientId)
-            .targetWalletId(originWalletId)
-            .clientId(targetClientId)
-            .walletId(targetWalletId)
-            .amount(BigDecimal.valueOf(100L))
-            .status(TransactionStatus.PROCESSING)
-            .date(LocalDateTime.now())
-            .build());
+    final Transaction transaction = Transaction.builder()
+        .id(BigInteger.ONE)
+        .targetClientId(originClientId)
+        .targetWalletId(originWalletId)
+        .clientId(targetClientId)
+        .walletId(targetWalletId)
+        .amount(BigDecimal.valueOf(100L))
+        .status(TransactionStatus.PROCESSING)
+        .date(LocalDateTime.now())
+        .build();
+    when(transactionRepository.save(transaction))
+        .thenReturn(transaction);
+
+    final Executable executable = () -> transactionService.doTransaction(transaction);
 
     verify(transactionRepository, times(0))
         .save(any(Transaction.class));
@@ -151,17 +158,21 @@ public class TransactionServiceImplTest {
   void shouldDoTransaction_whenWalletNotExists_thenThrowException() {
     walletRepository.delete(targetClientId, targetWalletId);
 
+    final Transaction transaction = Transaction.builder()
+        .id(BigInteger.ONE)
+        .targetClientId(originClientId)
+        .targetWalletId(originWalletId)
+        .clientId(targetClientId)
+        .walletId(targetWalletId)
+        .amount(BigDecimal.ONE)
+        .status(TransactionStatus.PROCESSING)
+        .date(LocalDateTime.now())
+        .build();
+    when(transactionRepository.save(transaction))
+        .thenReturn(transaction);
+
     final Executable executable = () -> transactionService.doTransaction(
-        Transaction.builder()
-            .id(BigInteger.ONE)
-            .targetClientId(originClientId)
-            .targetWalletId(originWalletId)
-            .clientId(targetClientId)
-            .walletId(targetWalletId)
-            .amount(BigDecimal.ONE)
-            .status(TransactionStatus.PROCESSING)
-            .date(LocalDateTime.now())
-            .build());
+        transaction);
 
     verify(transactionRepository, times(0))
         .save(any(Transaction.class));

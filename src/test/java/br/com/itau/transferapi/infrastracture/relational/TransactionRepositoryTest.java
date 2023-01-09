@@ -11,7 +11,6 @@ import br.com.itau.transferapi.infrastracture.repository.relational.model.Transa
 import br.com.itau.transferapi.infrastracture.repository.relational.model.WalletEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
