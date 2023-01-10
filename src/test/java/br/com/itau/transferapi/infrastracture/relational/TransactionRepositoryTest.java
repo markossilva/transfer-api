@@ -96,13 +96,14 @@ public class TransactionRepositoryTest {
   @Test
   void whenFindByClientIdAndWallet_thenReturnATransactions() {
     when(transactionJpaRepository.findAllByClientIdAndWallet(clientId, walletId))
-        .thenReturn(transactionEntity);
+        .thenReturn(Collections.singletonList(transactionEntity));
 
-    final Optional<Transaction> allByClientIdAndWallet = transactionRepository
+    final Optional<List<Transaction>> allByClientIdAndWallet = transactionRepository
         .findAllByClientIdAndWallet(clientId, walletId);
 
     assertTrue(allByClientIdAndWallet.isPresent());
-    assertEquals(allByClientIdAndWallet.get().getTargetWalletId(), transactionEntity.getWallet().getId());
+    assertEquals(allByClientIdAndWallet.get()
+        .stream().findFirst().get().getTargetWalletId(), transactionEntity.getWallet().getId());
   }
 
   @Test

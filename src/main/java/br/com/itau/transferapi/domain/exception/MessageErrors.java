@@ -2,6 +2,11 @@ package br.com.itau.transferapi.domain.exception;
 
 import lombok.Getter;
 
+/**
+ * Class centralize all exception error messages
+ *
+ * @author markos
+ */
 @Getter
 public enum MessageErrors {
   EMPTY(""),

@@ -181,13 +181,14 @@ public class ClientServiceImplTest {
     final Transaction providedTransactions = ClientProvider
         .getCreatedTransaction(randomClientID, randomWalletID);
     when(transactionRepository.findAllByClientIdAndWallet(randomClientID, randomWalletID))
-        .thenReturn(Optional.of(providedTransactions));
+        .thenReturn(Optional.of(Collections.singletonList(providedTransactions)));
 
-    final Transaction allTransactions = transactionService
+    final List<Transaction> allTransactions = transactionService
         .findAllTransactionsByWallet(randomClientID, randomWalletID);
 
     verify(transactionRepository).findAllByClientIdAndWallet(randomClientID, randomWalletID);
-    assertEquals(allTransactions.getTargetWalletId(), providedTransactions.getTargetWalletId());
+    assertEquals(allTransactions.stream().findFirst().get().getTargetWalletId(),
+        providedTransactions.getTargetWalletId());
   }
 
   @Test

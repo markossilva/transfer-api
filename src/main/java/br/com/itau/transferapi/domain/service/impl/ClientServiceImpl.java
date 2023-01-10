@@ -10,17 +10,18 @@ import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
 import br.com.itau.transferapi.domain.service.ClientService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
   private static final BigDecimal INITIAL_WALLET_BALANCE = BigDecimal.valueOf(100L);
+  private static final Logger logger = LogManager.getLogger(ClientServiceImpl.class);
 
   private final ClientRepository clientRepository;
   private final WalletRepository walletRepository;
@@ -30,6 +31,7 @@ public class ClientServiceImpl implements ClientService {
     final UUID clientId = client.getId();
 
     clientRepository.findById(clientId).ifPresent(s -> {
+      logger.error("Client has exists: {}#{}", s.getId(), s.getName());
       throw new ClientDomainException(MessageErrors.CLIENT_ALREADY_REGISTERED);
     });
 
@@ -58,9 +60,13 @@ public class ClientServiceImpl implements ClientService {
   @Override
   public Wallet createNewWallet(final UUID clientId, final Wallet wallet) {
     final Client client = clientRepository.findById(clientId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_EXISTS));
+        .orElseThrow(() -> {
+          logger.error("Client or wallet identifier not exists: {}#{}", clientId, wallet.getId());
+          return new ClientDomainException(MessageErrors.CLIENT_HAS_NO_EXISTS);
+        });
 
     if (!client.getId().equals(wallet.getClientId())) {
+      logger.error("Client not correspond with informed wallet: {}#{}", clientId, wallet.getId());
       throw new ClientDomainException(MessageErrors.DIFFERENT_WALLET_CLIENT_ID);
     }
 
@@ -70,18 +76,27 @@ public class ClientServiceImpl implements ClientService {
   @Override
   public List<Wallet> findAllWallets(UUID clientId) {
     return walletRepository.findByClientId(clientId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_WALLETS));
+        .orElseThrow(() -> {
+          logger.error("Client no has wallets: {}", clientId);
+          return new ClientDomainException(MessageErrors.CLIENT_HAS_NO_WALLETS);
+        });
   }
 
   @Override
   public Wallet findAWallet(UUID clientId, UUID walletId) {
     return walletRepository.findById(clientId, walletId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS));
+        .orElseThrow(() -> {
+          logger.error("Client no has this wallet: {}#{}", clientId, walletId);
+          return new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
+        });
   }
 
   @Override
   public Client findClientByWalletId(UUID walletId) {
     return clientRepository.findClientByWalletId(walletId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS));
+        .orElseThrow(() -> {
+          logger.error("This wallet no has client: {}", walletId);
+          return new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
+        });
   }
 }

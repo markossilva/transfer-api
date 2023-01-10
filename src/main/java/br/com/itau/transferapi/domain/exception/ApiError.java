@@ -1,4 +1,4 @@
-package br.com.itau.transferapi.application.exception;
+package br.com.itau.transferapi.domain.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

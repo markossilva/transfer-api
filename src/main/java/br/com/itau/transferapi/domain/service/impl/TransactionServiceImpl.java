@@ -2,25 +2,24 @@ package br.com.itau.transferapi.domain.service.impl;
 
 import br.com.itau.transferapi.domain.exception.ClientDomainException;
 import br.com.itau.transferapi.domain.exception.MessageErrors;
+import br.com.itau.transferapi.domain.exception.NotFoundDomainException;
 import br.com.itau.transferapi.domain.exception.TransactionDomainException;
-import br.com.itau.transferapi.domain.model.Transaction;
-import br.com.itau.transferapi.domain.model.TransactionStatus;
-import br.com.itau.transferapi.domain.model.TransactionType;
-import br.com.itau.transferapi.domain.model.Wallet;
+import br.com.itau.transferapi.domain.model.*;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
 import br.com.itau.transferapi.domain.service.TransactionService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
+  private static final Logger logger = LogManager.getLogger(TransactionServiceImpl.class);
   private static final long CLIENT_TRANSACTION_LIMIT = 1000L;
   private static final int ZERO_VALUE_COMPARATOR = 0;
   private final TransactionRepository transactionRepository;
@@ -31,6 +30,9 @@ public class TransactionServiceImpl implements TransactionService {
     final Wallet targetWallet = findAndVerifyWallet(transaction.getClientId(), transaction.getWalletId());
     final Wallet originWallet = findAndVerifyWallet(transaction.getTargetClientId(), transaction.getTargetWalletId());
 
+    transaction.setType(TransactionType.SEND);
+    transaction.setStatus(TransactionStatus.PROCESSING);
+
     final Transaction initialTransaction = transactionRepository.save(transaction);
     final BigDecimal transactionAmount = initialTransaction.getAmount();
 
@@ -38,11 +40,17 @@ public class TransactionServiceImpl implements TransactionService {
 
       if (transactionAmount.compareTo(BigDecimal.valueOf(CLIENT_TRANSACTION_LIMIT)) >= ZERO_VALUE_COMPARATOR) {
         defineTransactionStatus(buildFailTransaction(initialTransaction, targetWallet), TransactionStatus.FAIL, MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION);
+
+        logger.error(MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION.getMessage() + ": {}#{}",
+            transaction.getClientId(), transaction.getWalletId());
         throw new TransactionDomainException(MessageErrors.CLIENT_EXCEED_LIMIT_PER_TRANSACTION);
       }
 
       if (originWallet.getBalance().compareTo(transactionAmount) <= ZERO_VALUE_COMPARATOR) {
         defineTransactionStatus(buildFailTransaction(initialTransaction, targetWallet), TransactionStatus.FAIL, MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);
+
+        logger.error(MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE.getMessage() + ": {}#{}",
+            transaction.getClientId(), transaction.getWalletId());
         throw new TransactionDomainException(MessageErrors.CLIENT_HAS_NO_SUFFICIENT_BALANCE);
       }
 
@@ -87,9 +95,10 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   private Wallet findAndVerifyWallet(UUID clientId, UUID walletId) {
-    return walletRepository.findById(clientId, walletId).orElseThrow(() ->
-        new TransactionDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS)
-    );
+    return walletRepository.findById(clientId, walletId).orElseThrow(() -> {
+      logger.error(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS.getMessage() + ": {}#{}", clientId, walletId);
+      return new TransactionDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
+    });
   }
 
   private void defineTransactionStatus(final Transaction transaction, TransactionStatus status, MessageErrors error) {
@@ -120,12 +129,27 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public List<Transaction> findAllTransactions(UUID clientId) {
     return transactionRepository.findAllByClientId(clientId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
+        .orElseThrow(() -> {
+          logger.error(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS.getMessage() + ": {}", clientId);
+          return new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS);
+        });
   }
 
   @Override
-  public Transaction findAllTransactionsByWallet(UUID clientId, UUID walletId) {
+  public List<Transaction> findAllTransactionsByWallet(UUID clientId, UUID walletId) {
     return transactionRepository.findAllByClientIdAndWallet(clientId, walletId)
-        .orElseThrow(() -> new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS));
+        .orElseThrow(() -> {
+          logger.error(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS.getMessage() + ": {}#{}", clientId, walletId);
+          return new ClientDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS);
+        });
+  }
+
+  @Override
+  public List<WalletTransactions> findAllByWalletId(UUID walletID) {
+    return transactionRepository.findAllByWalletId(walletID)
+        .orElseThrow(() -> {
+          logger.error(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS.getMessage() + ": {}", walletID);
+          return new NotFoundDomainException(MessageErrors.CLIENT_HAS_NO_TRANSACTIONS);
+        });
   }
 }

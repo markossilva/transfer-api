@@ -1,3 +1,6 @@
+server:
+  servlet:
+    context-path: /transfer/api
 spring:
   mvc:
     pathmatch:

@@ -1,6 +1,7 @@
 package br.com.itau.transferapi.infrastracture.repository.relational;
 
 import br.com.itau.transferapi.domain.model.Transaction;
+import br.com.itau.transferapi.domain.model.WalletTransactions;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.infrastracture.repository.relational.model.TransactionEntity;
 import org.modelmapper.ModelMapper;
@@ -45,9 +46,13 @@ public class TransactionDbRepository implements TransactionRepository {
   }
 
   @Override
-  public Optional<Transaction> findAllByClientIdAndWallet(UUID clientID, UUID walletID) {
-    return Optional.of(mapper.map(transactionJpaRepository
-        .findAllByClientIdAndWallet(clientID, walletID), Transaction.class));
+  public Optional<List<Transaction>> findAllByClientIdAndWallet(UUID clientID, UUID walletID) {
+    final List<Transaction> transactions = transactionJpaRepository
+        .findAllByClientIdAndWallet(clientID, walletID)
+        .stream()
+        .map(transactionEntity -> mapper.map(transactionEntity, Transaction.class))
+        .collect(Collectors.toList());
+    return Optional.of(transactions);
   }
 
   @Override
@@ -55,5 +60,10 @@ public class TransactionDbRepository implements TransactionRepository {
     final TransactionEntity savedTransaction = transactionJpaRepository
         .save(mapper.map(transaction, TransactionEntity.class));
     return mapper.map(savedTransaction, Transaction.class);
+  }
+
+  @Override
+  public Optional<List<WalletTransactions>> findAllByWalletId(UUID walletID) {
+    return Optional.of(transactionJpaRepository.findAllByWalletId(walletID));
   }
 }
