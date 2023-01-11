@@ -1,17 +1,23 @@
 package br.com.itau.transferapi.application.rest;
 
+import br.com.itau.transferapi.application.req.TransactionParams;
 import br.com.itau.transferapi.domain.exception.ApplicationException;
 import br.com.itau.transferapi.domain.model.*;
 import br.com.itau.transferapi.domain.service.ClientService;
 import br.com.itau.transferapi.domain.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
@@ -21,13 +27,14 @@ import java.util.UUID;
 public class ClientController {
   private static final Logger logger = LogManager.getLogger(ClientController.class);
 
-  private static final String CREATE = "/create";
-  private static final String ALL_CLIENTS = "/all";
-  private static final String TRANSFER_VALUE = "/transfer/amount";
-  private static final String WALLETS_BY_CLIENT = "/{clientId}/wallets";
-  private static final String BY_WALLET_AND_CLIENT_ID = "/{clientId}/wallet/{walletId}";
-  private static final String CLIENT_BY_WALLET_ID = "/wallet/{walletId}";
-  private static final String CLIENT_WALLET_TRANSACTIONS = "/wallet/transactions/{walletId}";
+  private static final String CREATE = "/create",
+      ALL_CLIENTS = "/all",
+      TRANSFER_VALUE = "/transfer/amount",
+      WALLETS_BY_CLIENT = "/{clientId}/wallets",
+      BY_WALLET_AND_CLIENT_ID = "/{clientId}/wallet/{walletId}",
+      CLIENT_BY_WALLET_ID = "/wallet/{walletId}",
+      CLIENT_WALLET_TRANSACTIONS = "/wallet/transactions/{walletId}";
+
   private final ClientService service;
   private final TransactionService transactionService;
 
@@ -37,78 +44,183 @@ public class ClientController {
     this.transactionService = transactionService;
   }
 
+  @Operation(summary = "Create a new client with a wallet")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "201",
+          description = "Return a registered client and wallet identifier",
+          content = {
+              @Content(mediaType = "application/json", schema = @Schema(implementation = RegisteredClient.class))
+          }
+      )
+  })
   @PostMapping(
       path = CREATE,
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE
   )
   ResponseEntity<RegisteredClient> createClient(@RequestBody final Object createOrderRequest) {
-    final RegisteredClient clientTest = service
-        .createNewClient(Client.builder()
-            .id(UUID.randomUUID())
-            .name("Markos Test")
-            .build());
+    try {
+      final RegisteredClient clientTest = service
+          .createNewClient(Client.builder()
+              .id(UUID.randomUUID())
+              .name("Markos Test")
+              .build());
 
-    return ResponseEntity.ok(clientTest);
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(clientTest);
+    } catch (Exception e) {
+      logger.error("Error to createClient: {}", e.getMessage());
+      throw new ApplicationException(e);
+    }
   }
 
+  @Operation(summary = "Returns all clients with your respective wallets and transactions")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Return a list of registered clients",
+          content = {
+              @Content(mediaType = "application/json")
+          }
+      ),
+      @ApiResponse(responseCode = "400", description = "business layer error",
+          content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "list of clients not found",
+          content = @Content(mediaType = "application/json"))
+  })
   @GetMapping(path = ALL_CLIENTS)
   ResponseEntity<List<Client>> findAllClients() {
     return ResponseEntity.ok(service.findAllClients());
   }
 
+  @Operation(summary = "Performs a amount transfer between accounts and return the transaction identifier")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Return the transaction identifier",
+          content = {
+              @Content(mediaType = "application/json")
+          }
+      ),
+      @ApiResponse(responseCode = "400", description = "business layer error",
+          content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "error to create transaction",
+          content = @Content(mediaType = "application/json"))
+  })
   @PutMapping(path = TRANSFER_VALUE)
-  ResponseEntity<BigInteger> doTransaction(@RequestParam final String originClientId,
-                                           @RequestParam final String originWalletId,
-                                           @RequestParam final String targetClientId,
-                                           @RequestParam final String targetWalletId,
-                                           @RequestParam final BigDecimal amount) {
-    final Transaction buildTransaction = Transaction.builder()
-        .clientId(UUID.fromString(targetClientId))
-        .walletId(UUID.fromString(targetWalletId))
-        .targetClientId(UUID.fromString(originClientId))
-        .targetWalletId(UUID.fromString(originWalletId))
-        .status(TransactionStatus.PROCESSING)
-        .type(TransactionType.SEND)
-        .amount(amount)
-        .build();
-    transactionService.doTransaction(buildTransaction);
-    return ResponseEntity.ok(buildTransaction.getId());
+  ResponseEntity<BigInteger> doTransaction(@RequestBody TransactionParams params) {
+    try {
+      final Transaction buildTransaction = Transaction.builder()
+          .clientId(UUID.fromString(params.getTargetClientId()))
+          .walletId(UUID.fromString(params.getTargetWalletId()))
+          .targetClientId(UUID.fromString(params.getOriginClientId()))
+          .targetWalletId(UUID.fromString(params.getOriginWalletId()))
+          .amount(params.getAmount())
+          .build();
+      transactionService.doTransaction(buildTransaction);
+      return ResponseEntity.ok(buildTransaction.getId());
+    } catch (Exception e) {
+      logger.error("Error to findWalletsById: {}#{}. Message: {}",
+          params.getOriginClientId(), params.getOriginWalletId(), e.getMessage());
+      throw new ApplicationException(e);
+    }
   }
 
+  @Operation(summary = "Search all wallets of client identifier")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Return the list of the client wallets ",
+          content = {
+              @Content(mediaType = "application/json")
+          }
+      ),
+      @ApiResponse(responseCode = "400", description = "business layer error when try find wallets",
+          content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "list of wallets not found",
+          content = @Content(mediaType = "application/json"))
+  })
   @GetMapping(path = WALLETS_BY_CLIENT)
-  ResponseEntity<List<Wallet>> findAllWalletsByClient(@RequestParam final String clientId) {
-    return ResponseEntity.ok(service.findAllWallets(UUID.fromString(clientId)));
+  ResponseEntity<List<Wallet>> findAllWalletsByClient(@PathVariable final String clientId) {
+    try {
+      return ResponseEntity.ok(service.findAllWallets(UUID.fromString(clientId)));
+    } catch (Exception e) {
+      logger.error("Error to findAllWalletsByClient: client#{}. Message: {}", clientId, e.getMessage());
+      throw new ApplicationException(e);
+    }
   }
 
+  @Operation(summary = "Search a client wallet")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Return the client wallet",
+          content = {
+              @Content(mediaType = "application/json")
+          }
+      ),
+      @ApiResponse(responseCode = "400", description = "business layer error when try find wallet",
+          content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "wallet not found",
+          content = @Content(mediaType = "application/json"))
+  })
   @GetMapping(path = BY_WALLET_AND_CLIENT_ID)
-  ResponseEntity<Wallet> findWalletsById(@RequestParam final String clientId, @RequestParam final String walletId) {
+  ResponseEntity<Wallet> findWalletsById(@PathVariable final String clientId, @PathVariable final String walletId) {
     try {
       return ResponseEntity.ok(service
           .findAWallet(UUID.fromString(clientId), UUID.fromString(walletId)));
     } catch (Exception e) {
-      logger.error("Error to findWalletsById: wallet#{} - {}. Message: {}", clientId, walletId, e.getMessage());
+      logger.error("Error to findWalletsById: wallet#{} - {}. Message: {}", walletId, clientId, e.getMessage());
       throw new ApplicationException(e);
     }
   }
 
+  @Operation(summary = "Search a client by wallet identifier")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Return the client of the informed wallet",
+          content = {
+              @Content(mediaType = "application/json")
+          }
+      ),
+      @ApiResponse(responseCode = "400", description = "business layer error when try find a client",
+          content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "client not found",
+          content = @Content(mediaType = "application/json"))
+  })
   @GetMapping(path = CLIENT_BY_WALLET_ID)
-  ResponseEntity<Client> findClientByWalletId(@RequestParam final String walletId) {
+  ResponseEntity<Client> findClientByWalletId(@PathVariable final String walletId) {
     try {
       return ResponseEntity.ok(service.findClientByWalletId(UUID.fromString(walletId)));
     } catch (Exception e) {
-      logger.error("Error to findClientByWalletId: wallet#{} - {}", walletId, e.getMessage());
+      logger.error("Error to findClientByWalletId: wallet#{}. Message: {}", walletId, e.getMessage());
       throw new ApplicationException(e);
     }
   }
 
+  @Operation(summary = "Found all transactions by wallet identifier")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Return all client wallet transactions",
+          content = {
+              @Content(mediaType = "application/json")
+          }
+      ),
+      @ApiResponse(responseCode = "400", description = "business layer error when try find wallet transactions",
+          content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "wallet no has transactions",
+          content = @Content(mediaType = "application/json"))
+  })
   @GetMapping(path = CLIENT_WALLET_TRANSACTIONS)
   ResponseEntity<List<WalletTransactions>> findAllByWalletId(@PathVariable final String walletId) {
     try {
       return ResponseEntity.ok(transactionService
           .findAllByWalletId(UUID.fromString(walletId)));
     } catch (Exception e) {
-      logger.error("Error to findAllByWalletId: wallet#{} - {}", walletId, e.getMessage());
+      logger.error("Error to findAllByWalletId: wallet#{}. Message: {}", walletId, e.getMessage());
       throw new ApplicationException(e);
     }
   }
