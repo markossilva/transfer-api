@@ -2,6 +2,7 @@ package br.com.itau.transferapi.domain.service.impl;
 
 import br.com.itau.transferapi.domain.exception.ClientDomainException;
 import br.com.itau.transferapi.domain.exception.MessageErrors;
+import br.com.itau.transferapi.domain.exception.NotFoundDomainException;
 import br.com.itau.transferapi.domain.model.Client;
 import br.com.itau.transferapi.domain.model.RegisteredClient;
 import br.com.itau.transferapi.domain.model.Wallet;
@@ -62,7 +63,7 @@ public class ClientServiceImpl implements ClientService {
     final Client client = clientRepository.findById(clientId)
         .orElseThrow(() -> {
           logger.error("Client or wallet identifier not exists: {}#{}", clientId, wallet.getId());
-          return new ClientDomainException(MessageErrors.CLIENT_HAS_NO_EXISTS);
+          return new NotFoundDomainException(MessageErrors.CLIENT_HAS_NO_EXISTS);
         });
 
     if (!client.getId().equals(wallet.getClientId())) {
@@ -78,7 +79,7 @@ public class ClientServiceImpl implements ClientService {
     return walletRepository.findByClientId(clientId)
         .orElseThrow(() -> {
           logger.error("Client no has wallets: {}", clientId);
-          return new ClientDomainException(MessageErrors.CLIENT_HAS_NO_WALLETS);
+          return new NotFoundDomainException(MessageErrors.CLIENT_HAS_NO_WALLETS);
         });
   }
 
@@ -87,7 +88,7 @@ public class ClientServiceImpl implements ClientService {
     return walletRepository.findById(clientId, walletId)
         .orElseThrow(() -> {
           logger.error("Client no has this wallet: {}#{}", clientId, walletId);
-          return new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
+          return new NotFoundDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
         });
   }
 
@@ -96,7 +97,7 @@ public class ClientServiceImpl implements ClientService {
     return clientRepository.findClientByWalletId(walletId)
         .orElseThrow(() -> {
           logger.error("This wallet no has client: {}", walletId);
-          return new ClientDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
+          return new NotFoundDomainException(MessageErrors.CLIENT_OR_WALLET_NOT_EXISTS);
         });
   }
 }

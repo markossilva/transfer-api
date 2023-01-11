@@ -69,7 +69,7 @@ public class ClientController {
 
       return ResponseEntity.status(HttpStatus.CREATED)
           .body(clientTest);
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       logger.error("Error to createClient: {}", e.getMessage());
       throw new ApplicationException(e);
     }
@@ -120,7 +120,7 @@ public class ClientController {
           .build();
       transactionService.doTransaction(buildTransaction);
       return ResponseEntity.ok(buildTransaction.getId());
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       logger.error("Error to findWalletsById: {}#{}. Message: {}",
           params.getOriginClientId(), params.getOriginWalletId(), e.getMessage());
       throw new ApplicationException(e);
@@ -145,7 +145,7 @@ public class ClientController {
   ResponseEntity<List<Wallet>> findAllWalletsByClient(@PathVariable final String clientId) {
     try {
       return ResponseEntity.ok(service.findAllWallets(UUID.fromString(clientId)));
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       logger.error("Error to findAllWalletsByClient: client#{}. Message: {}", clientId, e.getMessage());
       throw new ApplicationException(e);
     }
@@ -170,7 +170,7 @@ public class ClientController {
     try {
       return ResponseEntity.ok(service
           .findAWallet(UUID.fromString(clientId), UUID.fromString(walletId)));
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       logger.error("Error to findWalletsById: wallet#{} - {}. Message: {}", walletId, clientId, e.getMessage());
       throw new ApplicationException(e);
     }
@@ -194,7 +194,7 @@ public class ClientController {
   ResponseEntity<Client> findClientByWalletId(@PathVariable final String walletId) {
     try {
       return ResponseEntity.ok(service.findClientByWalletId(UUID.fromString(walletId)));
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       logger.error("Error to findClientByWalletId: wallet#{}. Message: {}", walletId, e.getMessage());
       throw new ApplicationException(e);
     }
@@ -219,7 +219,7 @@ public class ClientController {
     try {
       return ResponseEntity.ok(transactionService
           .findAllByWalletId(UUID.fromString(walletId)));
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       logger.error("Error to findAllByWalletId: wallet#{}. Message: {}", walletId, e.getMessage());
       throw new ApplicationException(e);
     }
