@@ -1,5 +1,6 @@
 package br.com.itau.transferapi.application.rest;
 
+import br.com.itau.transferapi.application.req.CreateClientParams;
 import br.com.itau.transferapi.application.req.TransactionParams;
 import br.com.itau.transferapi.domain.exception.ApplicationException;
 import br.com.itau.transferapi.domain.model.*;
@@ -18,7 +19,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,16 +62,25 @@ public class ClientController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE
   )
-  ResponseEntity<RegisteredClient> createClient(@RequestBody final Object createOrderRequest) {
+  ResponseEntity<RegisteredClient> createClient(@RequestBody CreateClientParams createClientParams) {
     try {
-      final RegisteredClient clientTest = service
-          .createNewClient(Client.builder()
-              .id(UUID.randomUUID())
-              .name("Markos Test")
-              .build());
+
+      final Client client = Client.builder()
+          .id(UUID.randomUUID())
+          .name(createClientParams.getName())
+          .build();
+
+      final Wallet clientWallet = Wallet.builder()
+          .id(UUID.randomUUID())
+          .clientId(client.getId())
+          .balance(BigDecimal.valueOf(createClientParams.getInitialBalance()))
+          .status(WalletStatus.ACTIVE)
+          .build();
+
+      client.setWallets(Collections.singletonList(clientWallet));
 
       return ResponseEntity.status(HttpStatus.CREATED)
-          .body(clientTest);
+          .body(service.createNewClient(client));
     } catch (IllegalArgumentException e) {
       logger.error("Error to createClient: {}", e.getMessage());
       throw new ApplicationException(e);

@@ -1,10 +1,7 @@
 package br.com.itau.transferapi.domain.service;
 
 import br.com.itau.transferapi.domain.ClientProvider;
-import br.com.itau.transferapi.domain.model.Client;
-import br.com.itau.transferapi.domain.model.RegisteredClient;
-import br.com.itau.transferapi.domain.model.Transaction;
-import br.com.itau.transferapi.domain.model.Wallet;
+import br.com.itau.transferapi.domain.model.*;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
@@ -14,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,6 +47,15 @@ public class ClientServiceImplTest {
         .id(UUID.randomUUID())
         .name("ClientName")
         .build();
+
+    final Wallet clientWallet = Wallet.builder()
+        .id(UUID.randomUUID())
+        .clientId(client.getId())
+        .balance(BigDecimal.ONE)
+        .status(WalletStatus.ACTIVE)
+        .build();
+
+    client.setWallets(Collections.singletonList(clientWallet));
 
     final RegisteredClient registeredClient = service.createNewClient(client);
 

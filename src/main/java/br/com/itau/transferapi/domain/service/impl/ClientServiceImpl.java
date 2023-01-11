@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -29,27 +30,25 @@ public class ClientServiceImpl implements ClientService {
 
   @Override
   public RegisteredClient createNewClient(final Client client) {
-    final UUID clientId = client.getId();
 
-    clientRepository.findById(clientId).ifPresent(s -> {
+    clientRepository.findById(client.getId()).ifPresent(s -> {
       logger.error("Client has exists: {}#{}", s.getId(), s.getName());
       throw new ClientDomainException(MessageErrors.CLIENT_ALREADY_REGISTERED);
     });
 
-    final Wallet clientWallet = Wallet.builder()
-        .id(UUID.randomUUID())
-        .clientId(clientId)
-        .balance(INITIAL_WALLET_BALANCE)
-        .status(WalletStatus.ACTIVE)
-        .build();
+    final Optional<Wallet> wallet = client.getWallets()
+        .stream()
+        .findFirst();
 
-    client.setWallets(Collections.singletonList(clientWallet));
+    if (wallet.isEmpty()) {
+      throw new ClientDomainException(MessageErrors.CLIENT_HAS_NO_WALLETS);
+    }
 
     clientRepository.save(client);
 
     return RegisteredClient.builder()
-        .clientId(clientWallet.getClientId())
-        .walletId(clientWallet.getId())
+        .clientId(wallet.get().getClientId())
+        .walletId(wallet.get().getId())
         .build();
   }
 
