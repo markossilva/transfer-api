@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/client")
+@RequestMapping("/v1/client")
 public class ClientController {
   private static final Logger logger = LogManager.getLogger(ClientController.class);
 
@@ -128,7 +128,7 @@ public class ClientController {
           .walletId(UUID.fromString(params.getTargetWalletId()))
           .targetClientId(UUID.fromString(params.getOriginClientId()))
           .targetWalletId(UUID.fromString(params.getOriginWalletId()))
-          .amount(params.getAmount())
+          .amount(BigDecimal.valueOf(params.getAmount()))
           .build();
       transactionService.doTransaction(buildTransaction);
       return ResponseEntity.ok(buildTransaction.getId());
