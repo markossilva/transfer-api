@@ -2,6 +2,7 @@ package br.com.itau.transferapi.application.rest;
 
 import br.com.itau.transferapi.application.req.CreateClientParams;
 import br.com.itau.transferapi.application.req.TransactionParams;
+import br.com.itau.transferapi.application.resp.TransactionResponse;
 import br.com.itau.transferapi.domain.exception.ApplicationException;
 import br.com.itau.transferapi.domain.model.*;
 import br.com.itau.transferapi.domain.service.ClientService;
@@ -20,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -121,7 +121,7 @@ public class ClientController {
           content = @Content(mediaType = "application/json"))
   })
   @PutMapping(path = TRANSFER_VALUE)
-  ResponseEntity<BigInteger> doTransaction(@RequestBody TransactionParams params) {
+  ResponseEntity<TransactionResponse> doTransaction(@RequestBody TransactionParams params) {
     try {
       final Transaction buildTransaction = Transaction.builder()
           .clientId(UUID.fromString(params.getTargetClientId()))
@@ -130,8 +130,12 @@ public class ClientController {
           .targetWalletId(UUID.fromString(params.getOriginWalletId()))
           .amount(BigDecimal.valueOf(params.getAmount()))
           .build();
-      transactionService.doTransaction(buildTransaction);
-      return ResponseEntity.ok(buildTransaction.getId());
+      final Transaction transaction = transactionService
+          .doTransaction(buildTransaction);
+      return ResponseEntity.ok(TransactionResponse.builder()
+          .transactionId(transaction.getId())
+          .amount(transaction.getAmount())
+          .build());
     } catch (IllegalArgumentException e) {
       logger.error("Error to findWalletsById: {}#{}. Message: {}",
           params.getOriginClientId(), params.getOriginWalletId(), e.getMessage());
