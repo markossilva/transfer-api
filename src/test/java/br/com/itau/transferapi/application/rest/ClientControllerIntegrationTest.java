@@ -78,7 +78,8 @@ public class ClientControllerIntegrationTest {
 
   @Test
   public void givenIds_whenCreateClient_thenStatus200() throws Exception {
-    CreateClientParams params = new CreateClientParams("userTest", 10.0);
+    CreateClientParams params = new CreateClientParams(UUID.randomUUID().toString(),
+        "userTest", 10.0);
     final String jsonParams = mapper.writeValueAsString(params);
 
     mockMvc.perform(post("/v1/client/create")
@@ -86,6 +87,41 @@ public class ClientControllerIntegrationTest {
             .content(jsonParams)
         )
         .andExpect(status().isCreated())
+        .andExpect(content()
+            .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
+  public void givenIds_whenCreateClient_thenStatus400() throws Exception {
+    CreateClientParams params = new CreateClientParams(UUID.randomUUID().toString(),
+        "userTest", 10.0);
+    final String jsonParams = mapper.writeValueAsString(params);
+
+    when(clientRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.of(Client.builder().build()));
+
+    mockMvc.perform(post("/v1/client/create")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonParams)
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(content()
+            .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
+  public void givenIds_whenCreateClient_thenStatus422() throws Exception {
+    CreateClientParams params = new CreateClientParams("12345", "userTest", 10.0);
+    final String jsonParams = mapper.writeValueAsString(params);
+
+    when(clientRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.of(Client.builder().build()));
+
+    mockMvc.perform(post("/v1/client/create")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonParams)
+        )
+        .andExpect(status().isUnprocessableEntity())
         .andExpect(content()
             .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
   }
@@ -105,6 +141,7 @@ public class ClientControllerIntegrationTest {
         targetWalletId.toString(),
         1.0
     );
+
     final String jsonParams = mapper.writeValueAsString(params);
 
     when(walletRepository.findById(targetClientId, targetWalletId))
@@ -142,6 +179,24 @@ public class ClientControllerIntegrationTest {
   }
 
   @Test
+  public void givenTransactionId_whenTransferAmount_thenStatus422() throws Exception {
+    TransactionParams params = new TransactionParams(
+        "1234",
+        "1234",
+        "1234",
+        "1234",
+        1.0);
+
+    final String jsonParams = mapper.writeValueAsString(params);
+
+    mockMvc.perform(put("/v1/client/transfer/amount")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonParams))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
   public void givenWallets_whenGetAllById_thenStatus200() throws Exception {
     final UUID clientId = UUID.randomUUID();
 
@@ -159,6 +214,15 @@ public class ClientControllerIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$[0].clientId", is(clientId.toString())));
+  }
+
+  @Test
+  public void givenWallets_whenGetAllById_thenStatus422() throws Exception {
+
+    mockMvc.perform(get(String.format("/v1/client/%s/wallets", "12345"))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
   }
 
   @Test
@@ -182,6 +246,15 @@ public class ClientControllerIntegrationTest {
   }
 
   @Test
+  public void givenWallet_whenGetByWalletAndClientId_thenStatus422() throws Exception {
+
+    mockMvc.perform(get(String.format("/v1/client/%s/wallet/%s", "123", "123"))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
   public void givenClient_whenGetByWalletId_thenStatus200() throws Exception {
     final UUID walletId = UUID.randomUUID();
     final UUID clientId = UUID.randomUUID();
@@ -198,6 +271,27 @@ public class ClientControllerIntegrationTest {
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id", is(clientId.toString())))
         .andExpect(jsonPath("$.name", is("userTest")));
+  }
+
+  @Test
+  public void givenClient_whenGetByWalletId_thenStatus422() throws Exception {
+    mockMvc.perform(get(String.format("/v1/client/wallet/%s", "123"))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
+  public void givenClient_whenGetByWalletId_thenStatus404() throws Exception {
+    final UUID walletId = UUID.randomUUID();
+
+    when(clientRepository.findClientByWalletId(walletId))
+        .thenReturn(Optional.empty());
+
+    mockMvc.perform(get(String.format("/v1/client/wallet/%s", walletId))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
   }
 
   @Test
@@ -219,5 +313,25 @@ public class ClientControllerIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$[0].amount", is(10)));
+  }
+
+  @Test
+  public void givenAllTransactions_whenGetByWalletId_thenStatus422() throws Exception {
+    mockMvc.perform(get(String.format("/v1/client/wallet/transactions/%s", "123"))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
+  public void givenAllTransactions_whenGetByWalletId_thenStatus404() throws Exception {
+    final UUID walletId = UUID.randomUUID();
+    when(transactionRepository.findAllByWalletId(walletId))
+        .thenReturn(Optional.empty());
+
+    mockMvc.perform(get(String.format("/v1/client/wallet/transactions/%s", walletId))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
   }
 }

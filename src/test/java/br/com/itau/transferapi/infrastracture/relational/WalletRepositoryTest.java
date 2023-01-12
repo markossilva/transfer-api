@@ -11,10 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,6 +69,17 @@ public class WalletRepositoryTest {
     assertTrue(allByClientIdAndWallet.isPresent());
     assertEquals(allByClientIdAndWallet.get().getId(), walletEntity.getId());
     assertEquals(allByClientIdAndWallet.get().getClientId(), walletEntity.getWalletClientId());
+  }
+
+  @Test
+  void whenFindByClientIdAndWallet_thenReturnEmpty() {
+    when(walletJpaRepository.findByClientAndWallet(clientId, walletId))
+        .thenReturn(null);
+
+    final Optional<Wallet> allByClientIdAndWallet = walletRepository
+        .findById(clientId, walletId);
+
+    assertTrue(allByClientIdAndWallet.isEmpty());
   }
 
   @Test

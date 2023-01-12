@@ -66,7 +66,7 @@ public class ClientController {
     try {
 
       final Client client = Client.builder()
-          .id(UUID.randomUUID())
+          .id(UUID.fromString(createClientParams.getId()))
           .name(createClientParams.getName())
           .build();
 
@@ -132,10 +132,9 @@ public class ClientController {
           .build();
       final Transaction transaction = transactionService
           .doTransaction(buildTransaction);
-      return ResponseEntity.ok(TransactionResponse.builder()
-          .transactionId(transaction.getId())
-          .amount(transaction.getAmount())
-          .build());
+
+      return ResponseEntity.ok(new TransactionResponse(
+          transaction.getId(), transaction.getAmount()));
     } catch (IllegalArgumentException e) {
       logger.error("Error to findWalletsById: {}#{}. Message: {}",
           params.getOriginClientId(), params.getOriginWalletId(), e.getMessage());

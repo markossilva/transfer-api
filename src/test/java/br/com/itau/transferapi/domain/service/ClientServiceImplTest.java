@@ -1,6 +1,7 @@
 package br.com.itau.transferapi.domain.service;
 
 import br.com.itau.transferapi.domain.ClientProvider;
+import br.com.itau.transferapi.domain.exception.ClientDomainException;
 import br.com.itau.transferapi.domain.model.*;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
@@ -90,6 +91,24 @@ public class ClientServiceImplTest {
     verify(clientRepository, times(0))
         .save(any(Client.class));
     assertThrows(RuntimeException.class, executable);
+  }
+
+  @Test
+  void shouldCreateClient_withEmptyWallet_thenThrowException() {
+    final Client client = Client.builder()
+        .id(UUID.randomUUID())
+        .name("ClientName")
+        .wallets(new ArrayList<>())
+        .build();
+
+    when(clientRepository.findById(client.getId()))
+        .thenReturn(Optional.empty());
+
+    final Executable executable = () -> service.createNewClient(client);
+
+    verify(clientRepository, times(0))
+        .save(any(Client.class));
+    assertThrows(ClientDomainException.class, executable);
   }
 
   @Test

@@ -6,10 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateClientParams {
+  private final String id;
   private final String name;
   private final double initialBalance;
 
-  public CreateClientParams(String name, double initialBalance) {
+  public CreateClientParams(String id, String name, double initialBalance) {
+    this.id = id;
     this.name = name;
     this.initialBalance = initialBalance;
   }

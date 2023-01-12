@@ -75,4 +75,18 @@ public class ClientRepositoryTest {
         .getId(), clientEntity
         .getId());
   }
+
+  @Test
+  void whenFindClientByWalletId_thenReturn_client() {
+    final UUID clientId = UUID.randomUUID();
+    when(clientJpaRepository.findClientByWalletId(any(UUID.class)))
+        .thenReturn(ClientEntity.builder()
+            .id(clientId)
+            .name("test")
+            .build());
+
+    final Optional<Client> client = clientDbRepository
+        .findClientByWalletId(UUID.randomUUID());
+    assertEquals(client.get().getId(), clientId);
+  }
 }

@@ -1,8 +1,6 @@
 package br.com.itau.transferapi.infrastracture.relational;
 
-import br.com.itau.transferapi.domain.model.Transaction;
-import br.com.itau.transferapi.domain.model.TransactionStatus;
-import br.com.itau.transferapi.domain.model.WalletStatus;
+import br.com.itau.transferapi.domain.model.*;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.infrastracture.repository.relational.TransactionDbRepository;
 import br.com.itau.transferapi.infrastracture.repository.relational.TransactionJpaRepository;
@@ -117,5 +115,21 @@ public class TransactionRepositoryTest {
 
     verify(transactionJpaRepository).save(any(TransactionEntity.class));
     assertEquals(save.getId(), transactionEntity.getId());
+  }
+
+  @Test
+  void whenFindAllByWalletId_thenReturnAllWalletTransactions() {
+    final UUID walletId = UUID.randomUUID();
+    final List<WalletTransactions> walletTransactions = Collections
+        .singletonList(new WalletTransactions(BigDecimal.TEN, "",
+            TransactionType.SEND, "", LocalDateTime.now()));
+
+    when(transactionJpaRepository.findAllByWalletId(walletId))
+        .thenReturn(walletTransactions);
+
+    final Optional<List<WalletTransactions>> allByWallet = transactionRepository
+        .findAllByWalletId(walletId);
+    assertEquals(allByWallet.get().stream().findFirst().get().getType(),
+        TransactionType.SEND);
   }
 }

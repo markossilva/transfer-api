@@ -6,7 +6,6 @@ import br.com.itau.transferapi.domain.exception.NotFoundDomainException;
 import br.com.itau.transferapi.domain.model.Client;
 import br.com.itau.transferapi.domain.model.RegisteredClient;
 import br.com.itau.transferapi.domain.model.Wallet;
-import br.com.itau.transferapi.domain.model.WalletStatus;
 import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
 import br.com.itau.transferapi.domain.service.ClientService;
@@ -15,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
