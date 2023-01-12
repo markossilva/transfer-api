@@ -7,8 +7,8 @@ import java.math.BigInteger;
 
 @Getter
 public class TransactionResponse {
-  private BigInteger transactionId;
-  private BigDecimal amount;
+  private final BigInteger transactionId;
+  private final BigDecimal amount;
 
   public TransactionResponse(BigInteger transactionId, BigDecimal amount) {
     this.transactionId = transactionId;
