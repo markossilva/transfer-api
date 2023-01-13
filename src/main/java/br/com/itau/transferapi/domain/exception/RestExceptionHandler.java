@@ -26,19 +26,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(DomainException.class)
   @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-  protected ResponseEntity<?> handleDomainException(DomainException ex) {
+  protected ResponseEntity<Object> handleDomainException(DomainException ex) {
     return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex));
   }
 
   @ExceptionHandler(NotFoundDomainException.class)
   @ResponseStatus(code = HttpStatus.NOT_FOUND)
-  protected ResponseEntity<?> handleNotFoundDomainException(NotFoundDomainException ex) {
+  protected ResponseEntity<Object> handleNotFoundDomainException(NotFoundDomainException ex) {
     return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex));
   }
 
   @ExceptionHandler(ApplicationException.class)
   @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
-  protected ResponseEntity<?> handleApplicationException(ApplicationException ex) {
+  protected ResponseEntity<Object> handleApplicationException(ApplicationException ex) {
     return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, ex));
   }
 
