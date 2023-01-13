@@ -5,7 +5,7 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=markossilva_transfer-api&metric=bugs)](https://sonarcloud.io/summary/new_code?id=markossilva_transfer-api)
 
 ## General info
-This project is simples Lorem ipsum dolor generator.
+This project is simple api of clients, with multiple wallets, allowed transfer values between your wallets.
 Minimal [Spring Boot](http://projects.spring.io/spring-boot/) sample app.
 
 ## Requirements
