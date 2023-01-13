@@ -6,7 +6,6 @@
 
 ## General info
 This project is simple api of clients, with multiple wallets, allowed transfer values between your wallets.
-Minimal [Spring Boot](http://projects.spring.io/spring-boot/) sample app.
 
 ## Requirements
 
