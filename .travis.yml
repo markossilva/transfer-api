@@ -7,7 +7,7 @@ before_install:
 
 addons:
   sonarcloud:
-    organization: "sonarcloud-org-id"
+    organization: "mks-security"
     token:
       secure: $SONAR_TOKEN # Set in the settings page of your repository, as a secure variable
 
