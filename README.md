@@ -17,22 +17,17 @@ For building and running the application you need:
 
 ## Setup
 You can build a jar file and run it from the command line:
-
-
 ```
 git clone https://github.com/markossilva/transfer-api.git
 cd transfer-api
 ./mvnw package
 java -jar target/transfer-api.jar
 ```
-
-You can then access transfer-api here: http://localhost:8080/
-
 Or you can run it from Maven directly using the Spring Boot Maven plugin.
-
 ```
 ./mvnw spring-boot:run
 ```
+You can then access transfer-api here: http://localhost:8080/
 ## Database configuration
 
 In its default configuration, transfer-api uses an in-memory database (H2) which
