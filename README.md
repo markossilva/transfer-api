@@ -1,3 +1,4 @@
+[![Build Status](https://app.travis-ci.com/kyriosdata/exemplo.svg)](https://app.travis-ci.com/markossilva/transfer-api.svg?branch=main)
 ## Table of contents
 * [General Info] (#general-info)
 * [Technologies] (#technologies)
