@@ -8,15 +8,13 @@ import br.com.itau.transferapi.domain.repository.ClientRepository;
 import br.com.itau.transferapi.domain.repository.TransactionRepository;
 import br.com.itau.transferapi.domain.repository.WalletRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -34,7 +32,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,
     classes = Application.class
@@ -54,7 +51,7 @@ public class ClientControllerIntegrationTest {
   private TransactionRepository transactionRepository;
   private MockMvc mockMvc;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     mapper = new ObjectMapper();
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
